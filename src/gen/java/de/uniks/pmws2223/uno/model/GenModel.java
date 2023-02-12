@@ -6,6 +6,6 @@ import org.fulib.builder.ClassModelManager;
 public class GenModel implements ClassModelDecorator {
     @Override
     public void decorate(ClassModelManager mm) {
-
+        mm.haveNestedClasses(GenModel.class);
     }
 }
