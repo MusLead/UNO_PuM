@@ -5,7 +5,6 @@ import de.uniks.pmws2223.uno.model.Player;
 import de.uniks.pmws2223.uno.service.BotService;
 import de.uniks.pmws2223.uno.service.GameService;
 import de.uniks.pmws2223.uno.service.GameServiceException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Random;
@@ -52,5 +51,11 @@ public class GameServiceTest {
         assertEquals(DRAW_TWO,value);
         assertEquals(8,bot1.getCards().size());
 
+        value = BotService.botDrawCard(bot2.getCards().get(0), bot2, gameService);
+        assertEquals(6,player.getCards().size());
+        assertEquals(BLUE_9.getName(),value);
+        assertEquals(7,bot3.getCards().size());
     }
+
+
 }

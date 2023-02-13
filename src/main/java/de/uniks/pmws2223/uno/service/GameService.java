@@ -61,7 +61,7 @@ public class GameService {
      * @param card that will be put on the drawPile
      * @param player who draws the card
      * @return  the cards that has been drawn, otherwise NOT_VALID
-     * @throws GameServiceException
+     * @throws GameServiceException throw am exception for this specific class
      */
     public String drawCard(Card card, Player player) throws GameServiceException {
 
@@ -88,23 +88,30 @@ public class GameService {
             // if successful then draw a card
             drawPile.setCurrentCard(card);
             player.withoutCards(card);
+            drawPileCard = drawPile.getCurrentCard();
 
+            String returnValue;
             if(drawPileCard.getName().contains(SKIP)){
                 nextCurrentPlayer();
                 nextCurrentPlayer();
-                return SKIP;
+                returnValue = SKIP;
             } else if(drawPileCard.getName().contains(REVERSE)){
                 direction = direction.equals(RIGHT_WAY) ? LEFT_WAY : RIGHT_WAY;
                 nextCurrentPlayer();
-                return REVERSE;
+                returnValue = REVERSE;
             } else if(drawPileCard.getName().contains(DRAW_TWO)) {
                 nextCurrentPlayer();
                 addRandomCard(drawPile.getCurrentPlayer());
                 addRandomCard(drawPile.getCurrentPlayer());
-                return DRAW_TWO;
+                returnValue = DRAW_TWO;
+            } else {
+                //only normal number has been drawn to the drawPile;
+                returnValue = drawPileCard.getName();
             }
 
-            return drawPileCard.getName();
+            System.out.println(player + " has drawn a card, current card's drawPile : " + drawPileCard +
+                    ", " + drawPileCard.getColour());
+            return returnValue;
         }
 
         // if the card is wrong

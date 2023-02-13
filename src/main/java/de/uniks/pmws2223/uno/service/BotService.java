@@ -1,6 +1,5 @@
 package de.uniks.pmws2223.uno.service;
 
-import de.uniks.pmws2223.uno.Constants;
 import de.uniks.pmws2223.uno.model.Card;
 import de.uniks.pmws2223.uno.model.Player;
 
@@ -19,11 +18,12 @@ public class BotService {
                     return status;
                 }
             }
+            // if the robot does not have the card at all, take a random card from GameService
+            // and set a next current player to the gameService
+            gameService.addRandomCard(bot);
+            gameService.nextCurrentPlayer();
+            return WITHDRAW;
         }
-        // if the robot does not have the card at all, take a random card from GameService
-        // and set a next current player to the gameService
-        gameService.addRandomCard(bot);
-        gameService.nextCurrentPlayer();
-        return WITHDRAW;
+        return status;
     }
 }
