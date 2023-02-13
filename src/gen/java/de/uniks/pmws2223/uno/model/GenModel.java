@@ -8,28 +8,43 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public class GenModel implements ClassModelDecorator {
+
     public class Player {
         String name;
-        int cardsTotal;
-        @Link("player")
+        @Link()
+        TypePlayer typePlayer;
         List<Card> cards;
         @Link("currentPlayer")
+        DrawPile currentDrawPile;
+        @Link("players")
         DrawPile drawPile;
+
     }
 
     public class Card {
         String name;
-        String colour;
+        @Link()
+        Colour colour;
         int Number;
-        @Link("cards")
-        Player player;
     }
 
     public class DrawPile {
+        @Link()
         Card currentCard;
-        @Link("drawPile")
+        @Link("currentDrawPile")
         Player currentPlayer;
+        @Link("drawPile")
+        List<Player> players;
     }
+
+    public class Colour {
+        String name;
+    }
+
+    public class TypePlayer {
+        String type;
+    }
+
     @Override
     public void decorate(ClassModelManager mm) {
         mm.haveNestedClasses(GenModel.class);

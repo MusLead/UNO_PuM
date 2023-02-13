@@ -9,14 +9,16 @@ import java.beans.PropertyChangeSupport;
 public class Player
 {
    public static final String PROPERTY_NAME = "name";
-   public static final String PROPERTY_CARDS_TOTAL = "cardsTotal";
    public static final String PROPERTY_DRAW_PILE = "drawPile";
    public static final String PROPERTY_CARDS = "cards";
+   public static final String PROPERTY_CURRENT_DRAW_PILE = "currentDrawPile";
+   public static final String PROPERTY_TYPE_PLAYER = "typePlayer";
    private String name;
-   private int cardsTotal;
    private DrawPile drawPile;
-   private List<Card> cards;
    protected PropertyChangeSupport listeners;
+   private List<Card> cards;
+   private DrawPile currentDrawPile;
+   private TypePlayer typePlayer;
 
    public String getName()
    {
@@ -36,24 +38,6 @@ public class Player
       return this;
    }
 
-   public int getCardsTotal()
-   {
-      return this.cardsTotal;
-   }
-
-   public Player setCardsTotal(int value)
-   {
-      if (value == this.cardsTotal)
-      {
-         return this;
-      }
-
-      final int oldValue = this.cardsTotal;
-      this.cardsTotal = value;
-      this.firePropertyChange(PROPERTY_CARDS_TOTAL, oldValue, value);
-      return this;
-   }
-
    public DrawPile getDrawPile()
    {
       return this.drawPile;
@@ -70,12 +54,12 @@ public class Player
       if (this.drawPile != null)
       {
          this.drawPile = null;
-         oldValue.setCurrentPlayer(null);
+         oldValue.withoutPlayers(this);
       }
       this.drawPile = value;
       if (value != null)
       {
-         value.setCurrentPlayer(this);
+         value.withPlayers(this);
       }
       this.firePropertyChange(PROPERTY_DRAW_PILE, oldValue, value);
       return this;
@@ -92,10 +76,8 @@ public class Player
       {
          this.cards = new ArrayList<>();
       }
-      if (!this.cards.contains(value))
+      if (this.cards.add(value))
       {
-         this.cards.add(value);
-         value.setPlayer(this);
          this.firePropertyChange(PROPERTY_CARDS, null, value);
       }
       return this;
@@ -121,9 +103,8 @@ public class Player
 
    public Player withoutCards(Card value)
    {
-      if (this.cards != null && this.cards.remove(value))
+      if (this.cards != null && this.cards.removeAll(Collections.singleton(value)))
       {
-         value.setPlayer(null);
          this.firePropertyChange(PROPERTY_CARDS, value, null);
       }
       return this;
@@ -144,6 +125,51 @@ public class Player
       {
          this.withoutCards(item);
       }
+      return this;
+   }
+
+   public DrawPile getCurrentDrawPile()
+   {
+      return this.currentDrawPile;
+   }
+
+   public Player setCurrentDrawPile(DrawPile value)
+   {
+      if (this.currentDrawPile == value)
+      {
+         return this;
+      }
+
+      final DrawPile oldValue = this.currentDrawPile;
+      if (this.currentDrawPile != null)
+      {
+         this.currentDrawPile = null;
+         oldValue.setCurrentPlayer(null);
+      }
+      this.currentDrawPile = value;
+      if (value != null)
+      {
+         value.setCurrentPlayer(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_DRAW_PILE, oldValue, value);
+      return this;
+   }
+
+   public TypePlayer getTypePlayer()
+   {
+      return this.typePlayer;
+   }
+
+   public Player setTypePlayer(TypePlayer value)
+   {
+      if (this.typePlayer == value)
+      {
+         return this;
+      }
+
+      final TypePlayer oldValue = this.typePlayer;
+      this.typePlayer = value;
+      this.firePropertyChange(PROPERTY_TYPE_PLAYER, oldValue, value);
       return this;
    }
 
@@ -176,7 +202,8 @@ public class Player
 
    public void removeYou()
    {
+      this.setCurrentDrawPile(null);
       this.setDrawPile(null);
-      this.withoutCards(new ArrayList<>(this.getCards()));
+      this.setTypePlayer(null);
    }
 }

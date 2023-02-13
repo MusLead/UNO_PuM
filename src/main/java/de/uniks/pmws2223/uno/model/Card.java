@@ -5,14 +5,12 @@ import java.beans.PropertyChangeSupport;
 public class Card
 {
    public static final String PROPERTY_NAME = "name";
-   public static final String PROPERTY_COLOUR = "colour";
    public static final String PROPERTY_NUMBER = "Number";
-   public static final String PROPERTY_PLAYER = "player";
+   public static final String PROPERTY_COLOUR = "colour";
    private String name;
-   private String colour;
    private int Number;
-   private Player player;
    protected PropertyChangeSupport listeners;
+   private Colour colour;
 
    public String getName()
    {
@@ -29,24 +27,6 @@ public class Card
       final String oldValue = this.name;
       this.name = value;
       this.firePropertyChange(PROPERTY_NAME, oldValue, value);
-      return this;
-   }
-
-   public String getColour()
-   {
-      return this.colour;
-   }
-
-   public Card setColour(String value)
-   {
-      if (Objects.equals(value, this.colour))
-      {
-         return this;
-      }
-
-      final String oldValue = this.colour;
-      this.colour = value;
-      this.firePropertyChange(PROPERTY_COLOUR, oldValue, value);
       return this;
    }
 
@@ -68,30 +48,21 @@ public class Card
       return this;
    }
 
-   public Player getPlayer()
+   public Colour getColour()
    {
-      return this.player;
+      return this.colour;
    }
 
-   public Card setPlayer(Player value)
+   public Card setColour(Colour value)
    {
-      if (this.player == value)
+      if (this.colour == value)
       {
          return this;
       }
 
-      final Player oldValue = this.player;
-      if (this.player != null)
-      {
-         this.player = null;
-         oldValue.withoutCards(this);
-      }
-      this.player = value;
-      if (value != null)
-      {
-         value.withCards(this);
-      }
-      this.firePropertyChange(PROPERTY_PLAYER, oldValue, value);
+      final Colour oldValue = this.colour;
+      this.colour = value;
+      this.firePropertyChange(PROPERTY_COLOUR, oldValue, value);
       return this;
    }
 
@@ -119,12 +90,11 @@ public class Card
    {
       final StringBuilder result = new StringBuilder();
       result.append(' ').append(this.getName());
-      result.append(' ').append(this.getColour());
       return result.substring(1);
    }
 
    public void removeYou()
    {
-      this.setPlayer(null);
+      this.setColour(null);
    }
 }
