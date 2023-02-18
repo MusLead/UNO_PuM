@@ -8,6 +8,7 @@ public class GameServiceException extends Throwable {
      * @param message the additional message
      */
     public GameServiceException( String message ) {
+//        System.err.println(message);
         super(NOT_VALID + ": "+ message);
     }
 }

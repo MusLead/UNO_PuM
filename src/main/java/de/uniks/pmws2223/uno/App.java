@@ -15,11 +15,12 @@ public class App extends Application {
     private Stage stage;
     private Controller controller;
 
-    private GameService gameService; //TODO IT HAS TO BE RANDOMIZED! ERASE THE SEED!
+    private GameService gameService;
 
     public App(){
         this.gameService = new GameService(new Random());
     }
+
     public App( Random random ) {
         this.gameService = new GameService(random);
     }

@@ -1,7 +1,10 @@
 package de.uniks.pmws2223.uno.service;
 
+import de.uniks.pmws2223.uno.Constants;
 import de.uniks.pmws2223.uno.model.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static de.uniks.pmws2223.uno.Constants.*;
@@ -9,137 +12,272 @@ import static java.lang.Math.*;
 
 public class GameService {
     private final Random random;
-    private DrawPile drawPile = new DrawPile();
+    private final Constants constants = new Constants();
+    private  Encounter encounter = new Encounter();
+
+    public Constants getConstants() {
+        return constants;
+    }
 
     private String direction = RIGHT_WAY;
 
+    public String getDirection() {
+        return direction;
+    }
+
+    public Encounter getEncounter() {
+        return encounter;
+    }
+
     public GameService(){
         this.random = new Random();
-        int randomIndex = abs(random.nextInt() % ALL_CARDS.length);
-        this.drawPile.setCurrentCard(ALL_CARDS[randomIndex]);
+        int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
+        this.encounter.setCurrentCard(constants.ALL_CARDS[randomIndex]);
+        if(this.encounter.getCurrentCard().equals(constants.WILDCARD)){
+            this.encounter.getCurrentCard().setColour(BLUE);
+        }
     }
 
     /**
-     * this constructor should be used if the random has seed
+     * This constructor should be used if the random has seed
      * @param random with seed
      */
     public GameService( Random random ){
         this.random = random;
-        int randomIndex = abs(random.nextInt() % ALL_CARDS.length);
-        this.drawPile.setCurrentCard(ALL_CARDS[randomIndex]);
+        int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
+        this.encounter.setCurrentCard(constants.ALL_CARDS[randomIndex]);
+
+        if(this.encounter.getCurrentCard().equals(constants.WILDCARD)){
+            this.encounter.getCurrentCard().setColour(BLUE);
+        }
     }
 
     /**
-     * this constructor should be used if random has seed and
-     * a spesific card on a drawPile on start
+     * This constructor should be used if random has seed and
+     * a specific card on a deck pile on start
      * @param random with seed for spreading 7-randomize card to the player on start
-     * @param drawPile a specific card on the draw pile on start
+     * @param encounter a specific card on the draw pile on start
      */
-    public GameService( Random random, DrawPile drawPile){
+    public GameService( Random random, Encounter encounter ){
         this.random = random;
-        this.drawPile = drawPile;
+        this.encounter = encounter;
     }
 
+    /**
+     * This function gives 7-randomized card to the player.
+     * it also gives a permission who plays first. the player who has been created first
+     * they can draw a card drawCard() later on. if the player a robot, they can use
+     * BotService.botDrawCard()
+     * @param typePlayer type of the player BOT or HUMAN
+     * @param name name of the player
+     * @return the created player with a type, name, and 7-cards
+     */
     public Player createPlayer( TypePlayer typePlayer, String name ) {
-        Player player = new Player().setTypePlayer(typePlayer).setName(name).setDrawPile(this.drawPile);
-        for (int i = 0; i < 7; i++) {
-            addRandomCard(player);
+
+        Player player = new Player().setTypePlayer(typePlayer).setName(name).setEncounter(this.encounter);
+        if(encounter.getCurrentPlayer() == null) {
+            /*
+             * it means, at start of the play there is no Player who draws the card.
+             * By default, set the (FIRST) player as the current Player
+             */
+            encounter.setCurrentPlayer(player);
         }
-        System.out.println(player.getName() + " : " +player.getCards());
+        for (int i = 0; i < 7; i++) {
+            try{
+                addRandomCard(player);
+            } catch (StackOverflowError se){
+                System.err.println("(GameService.java:77) ");
+//                reset_ALL_CARD(); //THE PLAY IS GAME OVER!
+                throw new StackOverflowError(se.getLocalizedMessage());
+            } catch (GameServiceException e) {
+                System.err.println("(GameService.java:77) " + e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        System.out.println(player.getName() + " : " +player.getCards()); //DEBUG
         return player;
     }
 
-    protected void addRandomCard( Player player ) {
-        int randomIndex = abs(random.nextInt() % ALL_CARDS.length);
-        player.withCards(ALL_CARDS[randomIndex]);
+    /**
+     * This function add a card tp the player. it will look through
+     * the ALL_CARD constant, until it found one
+     * @param player
+     * @throws StackOverflowError
+     */
+    protected void addRandomCard( Player player ) throws StackOverflowError, GameServiceException {
+        int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
+        if(!player.getCards().contains(constants.ALL_CARDS[randomIndex]) && constants.ALL_CARDS[randomIndex].getPlayer() == null) {
+            player.withCards(constants.ALL_CARDS[randomIndex]);
+        } else {
+            // SIMPLE OPTION, BUT RISKY FOR THE TEST!
+            // if here player has the same card, try to find another card, recursively !
+            // until the player has one!
+            // addRandomCard(player);
+
+            // MORE SECURE OPTION, MORE WRITING
+            // if here player has the same card, try to find another card!
+            boolean isFound = false;
+            List<Card> takenCard = new ArrayList<>();
+            while(!isFound){
+                randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
+                if(!player.getCards().contains(constants.ALL_CARDS[randomIndex]) && constants.ALL_CARDS[randomIndex].getPlayer() == null) {
+                    player.withCards(constants.ALL_CARDS[randomIndex]);
+                    isFound = true;
+                }
+                if(constants.ALL_CARDS[randomIndex].getPlayer() != null && !takenCard.contains(constants.ALL_CARDS[randomIndex])) {
+                    takenCard.add(constants.ALL_CARDS[randomIndex]);
+                }
+                if(takenCard.size() == constants.ALL_CARDS.length){
+                    // if every card has been checked and there is no card left then there might be error
+                    throw new GameServiceException("All card have been taken!");
+                }
+            }
+        }
+//        System.out.println(constants.ALL_CARDS[randomIndex]); //DEBUG
     }
 
     /**
-     * this function gives a possibility for the player to draw a card to
-     * drawPile. the player who draws the card must be the currentPlayer
-     * in drawPile, otherwise it will throw an Exception
-     * @param card that will be put on the drawPile
+     * This function gives a possibility for the player to draw a card to
+     * deck pile. The player who draws the card must be the currentPlayer
+     * in deck pile, otherwise it will throw an Exception
+     * @param card that will be put on the deck pile
      * @param player who draws the card
      * @return  the cards that has been drawn, otherwise NOT_VALID
      * @throws GameServiceException throw am exception for this specific class
      */
     public String drawCard(Card card, Player player) throws GameServiceException {
 
-        if(drawPile.getCurrentPlayer() == null) {
-            /*
-             * it means, at start of the play there is no Player who draws the card.
-             * By default, set the player as the current Player
-             */
-            drawPile.setCurrentPlayer(player);
-        } else if(!drawPile.getCurrentPlayer().getName().equals(player.getName())) {
-            /*
-             * if the currentPlayer is not null, check if the currentPlayer is the same as the
-             * player who draws the card, otherwise decline the player!
-             */
-            throw new GameServiceException("NOT THE RIGHT PLAYER");
+        /*
+         * it means, at start of the play there is no Player who draws the card.
+         * By default, set the (FIRST) player who draws the card as the current Player
+         */
+        if(encounter.getCurrentPlayer() == null) {
+            encounter.setCurrentPlayer(player);
+        }
+        /*
+         * if the currentPlayer is not null, check if the currentPlayer is the same as the
+         * player who draws the card, otherwise decline the player!
+         */
+        else if(!encounter.getCurrentPlayer().getName().equals(player.getName())) {
+            throw new GameServiceException("NOT THE RIGHT PLAYER, Current Player: " + encounter.getCurrentPlayer());
         }
 
-        Card drawPileCard = drawPile.getCurrentCard();
+        Card deckPile = encounter.getCurrentCard();
 
-        if(drawPileCard.getName().equals(card.getName())
-            || drawPileCard.getColour().getName().equals(card.getColour().getName())
-                || (drawPileCard.getNumber() != 0 && card.getNumber() != 0 &&
-                drawPileCard.getNumber() == card.getNumber())){
-            // if successful then draw a card
-            drawPile.setCurrentCard(card);
-            player.withoutCards(card);
-            drawPileCard = drawPile.getCurrentCard();
+        // HERE PLAYER TRY TO DRAW THE CARD
+        try {
+            boolean isSameColour;
+            isSameColour = deckPile.getColour().getName().equals(card.getColour().getName());
+            String returnValue = null;
+            if(deckPile.getName().equals(card.getName())
+                || isSameColour
+                    || (deckPile.getNumber() != 0 && card.getNumber() != 0 &&
+                    deckPile.getNumber() == card.getNumber())) {
 
-            String returnValue;
-            if(drawPileCard.getName().contains(SKIP)){
-                nextCurrentPlayer();
-                nextCurrentPlayer();
-                returnValue = SKIP;
-            } else if(drawPileCard.getName().contains(REVERSE)){
-                direction = direction.equals(RIGHT_WAY) ? LEFT_WAY : RIGHT_WAY;
-                nextCurrentPlayer();
-                returnValue = REVERSE;
-            } else if(drawPileCard.getName().contains(DRAW_TWO)) {
-                nextCurrentPlayer();
-                addRandomCard(drawPile.getCurrentPlayer());
-                addRandomCard(drawPile.getCurrentPlayer());
-                returnValue = DRAW_TWO;
-            } else {
-                //only normal number has been drawn to the drawPile;
-                returnValue = drawPileCard.getName();
+                // if successful then draw a card
+                encounter.setCurrentCard(card);
+                int sizeBefore = player.getCards().size();
+                player.withoutCards(card);
+                assert player.getCards().size() != sizeBefore : new GameServiceException("the card is not being removed");
+                deckPile = encounter.getCurrentCard();
+
+                if(deckPile.getName().contains(SKIP)){
+                    nextCurrentPlayer();
+                    nextCurrentPlayer();
+                } else if(deckPile.getName().contains(REVERSE)){
+                    direction = direction.equals(RIGHT_WAY) ? LEFT_WAY : RIGHT_WAY;
+                    if(encounter.getPlayers().size() != 2){
+                        nextCurrentPlayer();
+                    }
+                } else if(deckPile.getName().contains(DRAW_TWO)) {
+                    nextCurrentPlayer();
+                    try{
+                        addRandomCard(encounter.getCurrentPlayer());
+                        addRandomCard(encounter.getCurrentPlayer());
+                    } catch (StackOverflowError se){
+                        System.err.println("(GameService.java:194) or 195" + se.getLocalizedMessage());
+                        throw new StackOverflowError(se.getLocalizedMessage());
+                    } catch (GameServiceException e) {
+                        System.err.println("(GameService.java:194) or 195" + e.getMessage());
+                        throw new RuntimeException(e.getMessage());
+                    }
+                } else {
+                    //only normal number has been drawn to the deck pile;
+                    nextCurrentPlayer(); //to the nextPlayer
+                }
+                returnValue = deckPile.getName() + "," + deckPile.getColour();
+                
+            } else if (card.getName().equals(WILDCARD_STRING)) {
+                nextCurrentPlayer(); //to the nextPlayer
+                encounter.setCurrentCard(card);
+                deckPile = encounter.getCurrentCard();
+                player.withoutCards(card);
+                returnValue = deckPile.getName() + "," + deckPile.getColour();
+                
             }
 
-            System.out.println(player + " has drawn a card, current card's drawPile : " + drawPileCard +
-                    ", " + drawPileCard.getColour());
-            return returnValue;
+//            if(player.getCards() == null) {
+//                reset_ALL_CARD();
+//            }
+            return returnValue == null ? NOT_VALID : returnValue;
+            /*
+            if there is no if statements above true, there is some possibility like:
+            - the current deck pile is WILDCARD with specific colour and the other cards is not wildcard
+                -> the colour of the card is not the same as the chosen WILDCARD's colour. therefore it
+                should be not valid
+             */
+        } catch (NullPointerException e) {
+            new GameServiceException(deckPile + " colour: " + deckPile.getColour());
         }
 
         // if the card is wrong
-        System.err.println("NOT THE RIGHT CARD! drawPile: " + drawPileCard +", "+ drawPileCard.getColour()
-                                               + " | "+ player.getName() + " draws: " + card);
         return NOT_VALID;
     }
 
-    protected void nextCurrentPlayer() throws GameServiceException {
-        int index = getIndexCurrentPlayer(drawPile.getCurrentPlayer());
+    /**
+     * set all card's player on the constants to null,
+     * so that the card can be used for another play.
+     */
+//    protected static void reset_ALL_CARD() {
+//        for (Card allCard : constants.ALL_CARDS) {
+//            allCard.setPlayer(null);
+//        }
+//    }
 
-        if(direction.equals(RIGHT_WAY)){
-            int nextIndex = (index + 1) % drawPile.getPlayers().size();
-            Player nextPlayer = drawPile.getPlayers().get(nextIndex);
-            drawPile.setCurrentPlayer(nextPlayer);
-        } else if(direction.equals(LEFT_WAY)){
-            int nextIndex = (index - 1) % drawPile.getPlayers().size();
-            Player nextPlayer = drawPile.getPlayers().get(nextIndex);
-            drawPile.setCurrentPlayer(nextPlayer);
+    /**
+     * This method choose a next player to draw a card.
+     * if the direction is not recognizable (RIGHT_WAY) or (LEFT_WAY)
+     * then it will throw an Error
+     * @throws GameServiceException
+     */
+    protected void nextCurrentPlayer() throws GameServiceException {
+        int index = getIndexCurrentPlayer(encounter.getCurrentPlayer());
+
+        if(direction.equals(RIGHT_WAY)) {
+            int nextIndex = (index + 1) % encounter.getPlayers().size();
+            Player nextPlayer = encounter.getPlayers().get(nextIndex);
+            encounter.setCurrentPlayer(nextPlayer);
+        } else if(direction.equals(LEFT_WAY)) {
+            int nextIndex = (index - 1) % encounter.getPlayers().size();
+            if(nextIndex < 0){
+                nextIndex = encounter.getPlayers().size() - 1;
+            }
+            Player nextPlayer = encounter.getPlayers().get(nextIndex);
+            encounter.setCurrentPlayer(nextPlayer);
         } else {
             throw new GameServiceException("INVALID DIRECTION");
         }
     }
 
-    private int getIndexCurrentPlayer( Player currentPlayer ) {
+    /**
+     * This function return am index where of a certain Player
+     * @param player a certain player
+     * @return an index of the player in the list of encounter
+     */
+    private int getIndexCurrentPlayer( Player player ) {
         int index = 0;
-        for (Player drawPilePlayer : drawPile.getPlayers()) {
-            if(drawPilePlayer.getName().equals(currentPlayer.getName())){
+        for (Player deckpilePlayer : encounter.getPlayers()) {
+            if(deckpilePlayer.getName().equals(player.getName())){
                 break;
             }
             index++;
@@ -147,15 +285,49 @@ public class GameService {
         return index;
     }
 
-    public int findIndexCards(String card, Player player){
+    /**
+     * This function return an Index of a certain card that belongs to
+     * the player. If the card is not being found, return -1
+     *
+     * @param card   a certain of card
+     * @param colour
+     * @param player a certain of player
+     * @return the index of a card, where is being saved in a list
+     */
+    public int findIndexCards( String card, Colour colour, Player player) {
         int index = 0;
         for (Card playerCard : player.getCards()) {
-            if(playerCard.getName().equals(card)) {
+            if(card.contains(playerCard.getName()) && playerCard.getColour().equals(colour)) {
                 return index;
             }
             index++;
         }
         return -1; // the card is not found!
+    }
+
+    /**
+     * This function let the Player withdraw the card and set another player
+     * to play the card
+     * @param player the player who wants to withdraw
+     * @return this GameService to call another methods or function
+     * @throws GameServiceException If it is a wrong player who draws the card
+     */
+    public GameService withdraw(Player player) throws GameServiceException {
+        if(!encounter.getCurrentPlayer().getTypePlayer().equals(BOT)) {
+            try{
+                addRandomCard(player);
+            } catch (StackOverflowError se) {
+                System.err.println("(GameService.java:318) ");
+                throw new StackOverflowError(se.getLocalizedMessage());
+            } catch (GameServiceException e) {
+                System.err.println("(GameService.java:318) " + e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
+            nextCurrentPlayer();
+        } else {
+            throw new GameServiceException("Not your turn yet!");
+        }
+        return this;
     }
 
 }

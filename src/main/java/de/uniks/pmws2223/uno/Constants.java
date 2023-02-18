@@ -4,7 +4,6 @@ import de.uniks.pmws2223.uno.model.Card;
 import de.uniks.pmws2223.uno.model.Colour;
 import de.uniks.pmws2223.uno.model.TypePlayer;
 
-import java.lang.reflect.Type;
 
 
 public class Constants {
