@@ -6,10 +6,12 @@ public class Card
 {
    public static final String PROPERTY_NAME = "name";
    public static final String PROPERTY_NUMBER = "Number";
+   public static final String PROPERTY_PLAYER = "player";
    public static final String PROPERTY_COLOUR = "colour";
    private String name;
    private int Number;
    protected PropertyChangeSupport listeners;
+   private Player player;
    private Colour colour;
 
    public String getName()
@@ -45,6 +47,33 @@ public class Card
       final int oldValue = this.Number;
       this.Number = value;
       this.firePropertyChange(PROPERTY_NUMBER, oldValue, value);
+      return this;
+   }
+
+   public Player getPlayer()
+   {
+      return this.player;
+   }
+
+   public Card setPlayer(Player value)
+   {
+      if (this.player == value)
+      {
+         return this;
+      }
+
+      final Player oldValue = this.player;
+      if (this.player != null)
+      {
+         this.player = null;
+         oldValue.withoutCards(this);
+      }
+      this.player = value;
+      if (value != null)
+      {
+         value.withCards(this);
+      }
+      this.firePropertyChange(PROPERTY_PLAYER, oldValue, value);
       return this;
    }
 
@@ -96,5 +125,6 @@ public class Card
    public void removeYou()
    {
       this.setColour(null);
+      this.setPlayer(null);
    }
 }

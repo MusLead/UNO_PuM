@@ -13,11 +13,19 @@ public class GenModel implements ClassModelDecorator {
         String name;
         @Link()
         TypePlayer typePlayer;
+        /*
+         * LOGIC FAULTY Link(): if I use Link() and if there
+         * is a same object within the list, it will be rejected!
+         *
+         * 16.02.2023  Is that true?
+         * 17.06.2023 Not really, you should have used the Link() to the other too!
+         */
+        @Link("player")
         List<Card> cards;
         @Link("currentPlayer")
-        DrawPile currentDrawPile;
+        Encounter currentDrawPile;
         @Link("players")
-        DrawPile drawPile;
+        Encounter encounter;
 
     }
 
@@ -26,14 +34,16 @@ public class GenModel implements ClassModelDecorator {
         @Link()
         Colour colour;
         int Number;
+        @Link("cards")
+        Player player;
     }
 
-    public class DrawPile {
+    public class Encounter {
         @Link()
         Card currentCard;
         @Link("currentDrawPile")
         Player currentPlayer;
-        @Link("drawPile")
+        @Link("encounter")
         List<Player> players;
     }
 

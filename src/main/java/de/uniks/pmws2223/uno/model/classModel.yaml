@@ -1,5 +1,5 @@
 - c: 	org.fulib.classmodel.ClassModel
-  classes: 	typePlayer 	colour 	drawPile 	card 	player
+  classes: 	typePlayer 	colour 	encounter 	card 	player
   defaultCollectionType: 	c1
   defaultPropertyStyle: 	Bean
   defaultRoleType: 	"java.util.ArrayList<%s>"
@@ -23,12 +23,12 @@
   propertyStyle: 	Bean
   roles: 	colour_Card_colour
 
-- drawPile: 	org.fulib.classmodel.Clazz
+- encounter: 	org.fulib.classmodel.Clazz
   model: 	c
   modified: 	false
-  name: 	DrawPile
+  name: 	Encounter
   propertyStyle: 	Bean
-  roles: 	drawPile_currentCard 	drawPile_currentPlayer 	drawPile_players
+  roles: 	encounter_currentCard 	encounter_currentPlayer 	encounter_players
 
 - card: 	org.fulib.classmodel.Clazz
   attributes: 	card_name 	card_Number
@@ -36,15 +36,15 @@
   modified: 	false
   name: 	Card
   propertyStyle: 	Bean
-  roles: 	card_DrawPile_currentCard 	card_colour
+  roles: 	card_Encounter_currentCard 	card_colour 	card_player
 
 - player: 	org.fulib.classmodel.Clazz
-  attributes: 	player_name 	player_cards
+  attributes: 	player_name
   model: 	c
   modified: 	false
   name: 	Player
   propertyStyle: 	Bean
-  roles: 	player_currentDrawPile 	player_drawPile 	player_typePlayer
+  roles: 	player_currentDrawPile 	player_encounter 	player_cards 	player_typePlayer
 
 - c1: 	org.fulib.classmodel.CollectionType
   implClass: 	class java.util.ArrayList
@@ -93,35 +93,35 @@
   propertyStyle: 	Bean
   roleType: 	"java.util.ArrayList<%s>"
 
-- drawPile_currentCard: 	org.fulib.classmodel.AssocRole
+- encounter_currentCard: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	1
-  clazz: 	drawPile
-  id: 	DrawPile_currentCard
+  clazz: 	encounter
+  id: 	Encounter_currentCard
   modified: 	false
   name: 	currentCard
-  other: 	card_DrawPile_currentCard
+  other: 	card_Encounter_currentCard
   propertyStyle: 	Bean
 
-- drawPile_currentPlayer: 	org.fulib.classmodel.AssocRole
+- encounter_currentPlayer: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	1
-  clazz: 	drawPile
-  id: 	DrawPile_currentPlayer
+  clazz: 	encounter
+  id: 	Encounter_currentPlayer
   modified: 	false
   name: 	currentPlayer
   other: 	player_currentDrawPile
   propertyStyle: 	Bean
 
-- drawPile_players: 	org.fulib.classmodel.AssocRole
+- encounter_players: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	42
-  clazz: 	drawPile
+  clazz: 	encounter
   collectionType: 	c1
-  id: 	DrawPile_players
+  id: 	Encounter_players
   modified: 	false
   name: 	players
-  other: 	player_drawPile
+  other: 	player_encounter
   propertyStyle: 	Bean
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -143,14 +143,14 @@
   type: 	int
   typeSignature: 	int
 
-- card_DrawPile_currentCard: 	org.fulib.classmodel.AssocRole
+- card_Encounter_currentCard: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	0
   clazz: 	card
   collectionType: 	c1
-  id: 	Card_DrawPile_currentCard
+  id: 	Card_Encounter_currentCard
   modified: 	false
-  other: 	drawPile_currentCard
+  other: 	encounter_currentCard
   propertyStyle: 	Bean
   roleType: 	"java.util.ArrayList<%s>"
 
@@ -164,6 +164,16 @@
   other: 	colour_Card_colour
   propertyStyle: 	Bean
 
+- card_player: 	org.fulib.classmodel.AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	card
+  id: 	Card_player
+  modified: 	false
+  name: 	player
+  other: 	player_cards
+  propertyStyle: 	Bean
+
 - player_name: 	org.fulib.classmodel.Attribute
   clazz: 	player
   id: 	Player_name
@@ -173,16 +183,6 @@
   type: 	String
   typeSignature: 	String
 
-- player_cards: 	org.fulib.classmodel.Attribute
-  clazz: 	player
-  collectionType: 	c1
-  id: 	Player_cards
-  modified: 	false
-  name: 	cards
-  propertyStyle: 	Bean
-  type: 	Card
-  typeSignature: 	Card
-
 - player_currentDrawPile: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	1
@@ -190,18 +190,30 @@
   id: 	Player_currentDrawPile
   modified: 	false
   name: 	currentDrawPile
-  other: 	drawPile_currentPlayer
+  other: 	encounter_currentPlayer
   propertyStyle: 	Bean
 
-- player_drawPile: 	org.fulib.classmodel.AssocRole
+- player_encounter: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	player
-  id: 	Player_drawPile
+  id: 	Player_encounter
   modified: 	false
-  name: 	drawPile
-  other: 	drawPile_players
+  name: 	encounter
+  other: 	encounter_players
   propertyStyle: 	Bean
+
+- player_cards: 	org.fulib.classmodel.AssocRole
+  aggregation: 	false
+  cardinality: 	42
+  clazz: 	player
+  collectionType: 	c1
+  id: 	Player_cards
+  modified: 	false
+  name: 	cards
+  other: 	card_player
+  propertyStyle: 	Bean
+  roleType: 	"java.util.ArrayList<%s>"
 
 - player_typePlayer: 	org.fulib.classmodel.AssocRole
   aggregation: 	false

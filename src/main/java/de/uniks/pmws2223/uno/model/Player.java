@@ -9,15 +9,15 @@ import java.beans.PropertyChangeSupport;
 public class Player
 {
    public static final String PROPERTY_NAME = "name";
-   public static final String PROPERTY_DRAW_PILE = "drawPile";
-   public static final String PROPERTY_CARDS = "cards";
    public static final String PROPERTY_CURRENT_DRAW_PILE = "currentDrawPile";
+   public static final String PROPERTY_ENCOUNTER = "encounter";
+   public static final String PROPERTY_CARDS = "cards";
    public static final String PROPERTY_TYPE_PLAYER = "typePlayer";
    private String name;
-   private DrawPile drawPile;
    protected PropertyChangeSupport listeners;
+   private Encounter currentDrawPile;
+   private Encounter encounter;
    private List<Card> cards;
-   private DrawPile currentDrawPile;
    private TypePlayer typePlayer;
 
    public String getName()
@@ -38,30 +38,57 @@ public class Player
       return this;
    }
 
-   public DrawPile getDrawPile()
+   public Encounter getCurrentDrawPile()
    {
-      return this.drawPile;
+      return this.currentDrawPile;
    }
 
-   public Player setDrawPile(DrawPile value)
+   public Player setCurrentDrawPile(Encounter value)
    {
-      if (this.drawPile == value)
+      if (this.currentDrawPile == value)
       {
          return this;
       }
 
-      final DrawPile oldValue = this.drawPile;
-      if (this.drawPile != null)
+      final Encounter oldValue = this.currentDrawPile;
+      if (this.currentDrawPile != null)
       {
-         this.drawPile = null;
+         this.currentDrawPile = null;
+         oldValue.setCurrentPlayer(null);
+      }
+      this.currentDrawPile = value;
+      if (value != null)
+      {
+         value.setCurrentPlayer(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_DRAW_PILE, oldValue, value);
+      return this;
+   }
+
+   public Encounter getEncounter()
+   {
+      return this.encounter;
+   }
+
+   public Player setEncounter(Encounter value)
+   {
+      if (this.encounter == value)
+      {
+         return this;
+      }
+
+      final Encounter oldValue = this.encounter;
+      if (this.encounter != null)
+      {
+         this.encounter = null;
          oldValue.withoutPlayers(this);
       }
-      this.drawPile = value;
+      this.encounter = value;
       if (value != null)
       {
          value.withPlayers(this);
       }
-      this.firePropertyChange(PROPERTY_DRAW_PILE, oldValue, value);
+      this.firePropertyChange(PROPERTY_ENCOUNTER, oldValue, value);
       return this;
    }
 
@@ -76,8 +103,10 @@ public class Player
       {
          this.cards = new ArrayList<>();
       }
-      if (this.cards.add(value))
+      if (!this.cards.contains(value))
       {
+         this.cards.add(value);
+         value.setPlayer(this);
          this.firePropertyChange(PROPERTY_CARDS, null, value);
       }
       return this;
@@ -103,8 +132,9 @@ public class Player
 
    public Player withoutCards(Card value)
    {
-      if (this.cards != null && this.cards.removeAll(Collections.singleton(value)))
+      if (this.cards != null && this.cards.remove(value))
       {
+         value.setPlayer(null);
          this.firePropertyChange(PROPERTY_CARDS, value, null);
       }
       return this;
@@ -125,33 +155,6 @@ public class Player
       {
          this.withoutCards(item);
       }
-      return this;
-   }
-
-   public DrawPile getCurrentDrawPile()
-   {
-      return this.currentDrawPile;
-   }
-
-   public Player setCurrentDrawPile(DrawPile value)
-   {
-      if (this.currentDrawPile == value)
-      {
-         return this;
-      }
-
-      final DrawPile oldValue = this.currentDrawPile;
-      if (this.currentDrawPile != null)
-      {
-         this.currentDrawPile = null;
-         oldValue.setCurrentPlayer(null);
-      }
-      this.currentDrawPile = value;
-      if (value != null)
-      {
-         value.setCurrentPlayer(this);
-      }
-      this.firePropertyChange(PROPERTY_CURRENT_DRAW_PILE, oldValue, value);
       return this;
    }
 
@@ -203,7 +206,8 @@ public class Player
    public void removeYou()
    {
       this.setCurrentDrawPile(null);
-      this.setDrawPile(null);
+      this.setEncounter(null);
+      this.withoutCards(new ArrayList<>(this.getCards()));
       this.setTypePlayer(null);
    }
 }
