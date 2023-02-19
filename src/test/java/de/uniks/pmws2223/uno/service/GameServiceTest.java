@@ -1,33 +1,22 @@
 package de.uniks.pmws2223.uno.service;
 
-import com.googlecode.junittoolbox.ParallelRunner;
+
 import de.uniks.pmws2223.uno.model.Card;
 import de.uniks.pmws2223.uno.model.Encounter;
 import de.uniks.pmws2223.uno.model.Player;
-import org.junit.AfterClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.uniks.pmws2223.uno.Constants.*;
-import static de.uniks.pmws2223.uno.service.BotService.*;
-import static org.junit.Assert.*;
+import static de.uniks.pmws2223.uno.service.BotService.botDrawCard;
+import static org.junit.Assert.assertEquals;
 
-//@RunWith(ParallelRunner.class)
 public class GameServiceTest {
-//    public static AtomicBoolean running = new AtomicBoolean(true);
-//
-//    @AfterClass
-//    public static void afterClass() {
-//        System.out.println("ok, game-service test finished!");
-//        running.set(false);
-//    }
+
     private Random random = new Random(100);
     @Test
     public void CreatePlayer(){
