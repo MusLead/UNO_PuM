@@ -68,7 +68,7 @@ public class Constants {
     public final  Card SKIP_RED = new Card().setName(SKIP).setColour(RED);
     public final  Card SKIP_YELLOW = new Card().setName(SKIP).setColour(YELLOW);
 
-    public final static String DRAW_TWO = "DRAW_TWO";
+    public final static String DRAW_TWO = "+2\nCards";
     public final  Card DRAW_TWO_BLUE = new Card().setName(DRAW_TWO).setColour(BLUE);
     public final  Card DRAW_TWO_GREEN = new Card().setName(DRAW_TWO).setColour(GREEN);
     public final  Card DRAW_TWO_RED = new Card().setName(DRAW_TWO).setColour(RED);

@@ -45,6 +45,7 @@ public class App extends Application {
             ex.printStackTrace();
             return;
         }
+        stage.sizeToScene();
 
         if (this.controller != null) {
             this.controller.destroy();

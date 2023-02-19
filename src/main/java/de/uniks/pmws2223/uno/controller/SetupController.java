@@ -19,7 +19,7 @@ public class SetupController implements Controller{
     @FXML
     public Button logInButton;
     @FXML
-    public ChoiceBox choiceBoxBots;
+    public ChoiceBox<String> choiceBoxBots;
 
     public SetupController( App app, GameService gameService ) {
         this.app = app;
@@ -45,10 +45,8 @@ public class SetupController implements Controller{
         choiceBoxBots.getItems().setAll("1","2","3");
         choiceBoxBots.setValue("1");
         logInButton.setDefaultButton(true);
-        logInButton.setOnAction(actionEvent -> {
-            app.show(new IngameController(app,gameService,nameField.getText(),
-                                          Integer.parseInt((String) choiceBoxBots.getValue())));
-        });
+        logInButton.setOnAction(actionEvent -> app.show(new IngameController(app, gameService, nameField.getText(),
+                                                                         Integer.parseInt(choiceBoxBots.getValue()))));
 
         return parent;
     }

@@ -147,6 +147,12 @@ public class GameService {
      */
     public String drawCard(Card card, Player player) throws GameServiceException {
 
+        for (Player encounterPlayer : encounter.getPlayers()) {
+            if(encounterPlayer.getCards().size() == 0){
+                return SUCCESS;
+            }
+        }
+
         /*
          * it means, at start of the play there is no Player who draws the card.
          * By default, set the (FIRST) player who draws the card as the current Player
@@ -166,13 +172,8 @@ public class GameService {
 
         // HERE PLAYER TRY TO DRAW THE CARD
         try {
-            boolean isSameColour;
-            isSameColour = deckPile.getColour().getName().equals(card.getColour().getName());
             String returnValue = null;
-            if(deckPile.getName().equals(card.getName())
-                || isSameColour
-                    || (deckPile.getNumber() != 0 && card.getNumber() != 0 &&
-                    deckPile.getNumber() == card.getNumber())) {
+            if(isConditionTrue(card, deckPile)) {
 
                 // if successful then draw a card
                 encounter.setCurrentCard(card);
@@ -194,7 +195,7 @@ public class GameService {
                     try{
                         addRandomCard(encounter.getCurrentPlayer());
                         addRandomCard(encounter.getCurrentPlayer());
-                    } catch (StackOverflowError se){
+                    } catch (StackOverflowError se){ // TODO clean up stackoverflow catches!
                         System.err.println("(GameService.java:194) or 195" + se.getLocalizedMessage());
                         throw new StackOverflowError(se.getLocalizedMessage());
                     } catch (GameServiceException e) {
@@ -232,6 +233,14 @@ public class GameService {
 
         // if the card is wrong
         return NOT_VALID;
+    }
+
+    public static boolean isConditionTrue( Card card, Card deckPile) {
+        boolean isSameColour = deckPile.getColour().getName().equals(card.getColour().getName());
+        return deckPile.getName().equals(card.getName())
+                || isSameColour
+                || (deckPile.getNumber() != 0 && card.getNumber() != 0 &&
+                deckPile.getNumber() == card.getNumber());
     }
 
     /**
