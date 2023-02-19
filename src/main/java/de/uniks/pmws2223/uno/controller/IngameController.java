@@ -411,14 +411,17 @@ public class IngameController implements Controller{
      */
     private void setWithdrawButton( Player player ) {
         withdraw.setOnMouseClicked(actionEvent -> {
-            try {
-                gameService.withdraw(player);
-                // to let the user knows whose turn to play
-                updateGameScreen(gameService.getEncounter().getCurrentCard(),WITHDRAW);
-            } catch (GameServiceException e) {
-                System.err.println(e.getMessage());
-                // IT MEANS ALL CARD HAS BEEN TAKEN
-                throw new RuntimeException(e);
+            //withdraw only if the player turns to play!
+            if(gameService.getEncounter().getCurrentPlayer().equals(player)) {
+                try {
+                    gameService.withdraw(player);
+                    // to let the user knows whose turn to play
+                    updateGameScreen(gameService.getEncounter().getCurrentCard(), WITHDRAW);
+                } catch (GameServiceException e) {
+                    System.err.println(e.getMessage());
+                    // IT MEANS ALL CARD HAS BEEN TAKEN
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
