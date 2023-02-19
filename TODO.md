@@ -6,6 +6,8 @@ Regardless of the type (robot or human)
 - clean up the code
 - think again about the necessary test!
 - add some explanation every method including Ingame!
+- change object and class diagram into currentDiscardPile!
+- change draw a card to place a card, because they have different definiton!
 
 # Journal
 Kassel, 18.02.2023
