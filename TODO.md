@@ -30,3 +30,7 @@ Today i just design the Maschine better in some way.
 what took me a lot of time is to think how the cards can hover and how
 can i simulate the stack of the pile from the robot.
 That was a real challenge.
+
+I have some questions regardles to the test. I have some randomized card.
+do i have to test all action ability with in a method ( i make a lot of methods,
+where i test only one action behaviour.)?
