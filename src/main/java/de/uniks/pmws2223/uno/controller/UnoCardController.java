@@ -86,7 +86,9 @@ public class UnoCardController implements Controller{
                 // set the value only if the card is not action card
                 setValue(card.getNumber() == 0 ? card.getName() : Integer.toString(card.getNumber()));
                 String value = card.getName() + "," + card.getColour();
-                indexCardOnClick.set(gameService.findIndexCards(value, card.getColour(), player));
+                if (indexCardOnClick != null) {
+                    indexCardOnClick.set(gameService.findIndexCards(value, card.getColour(), player));
+                }
                 String result = null;
                 try {
                     result = gameService.drawCard(card, player);

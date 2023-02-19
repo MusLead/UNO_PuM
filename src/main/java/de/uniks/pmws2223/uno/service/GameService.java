@@ -13,7 +13,7 @@ import static java.lang.Math.*;
 public class GameService {
     private final Random random;
     private final Constants constants = new Constants();
-    private  Encounter encounter = new Encounter();
+    private final Encounter encounter = new Encounter();
 
     public Constants getConstants() {
         return constants;
@@ -50,17 +50,6 @@ public class GameService {
         if(this.encounter.getCurrentCard().equals(constants.WILDCARD)){
             this.encounter.getCurrentCard().setColour(BLUE);
         }
-    }
-
-    /**
-     * This constructor should be used if random has seed and
-     * a specific card on a deck pile on start
-     * @param random with seed for spreading 7-randomize card to the player on start
-     * @param encounter a specific card on the draw pile on start
-     */
-    public GameService( Random random, Encounter encounter ){
-        this.random = random;
-        this.encounter = encounter;
     }
 
     /**
@@ -101,8 +90,8 @@ public class GameService {
     /**
      * This function add a card tp the player. it will look through
      * the ALL_CARD constant, until it found one
-     * @param player
-     * @throws StackOverflowError
+     * @param player the player who will get a card
+     * @throws StackOverflowError the card might not be found
      */
     protected void addRandomCard( Player player ) throws StackOverflowError, GameServiceException {
         int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
@@ -228,11 +217,11 @@ public class GameService {
                 should be not valid
              */
         } catch (NullPointerException e) {
-            new GameServiceException(deckPile + " colour: " + deckPile.getColour());
+            throw new GameServiceException(deckPile + " colour: " + deckPile.getColour());
         }
 
         // if the card is wrong
-        return NOT_VALID;
+//        return NOT_VALID;
     }
 
     public static boolean isConditionTrue( Card card, Card deckPile) {
@@ -244,20 +233,10 @@ public class GameService {
     }
 
     /**
-     * set all card's player on the constants to null,
-     * so that the card can be used for another play.
-     */
-//    protected static void reset_ALL_CARD() {
-//        for (Card allCard : constants.ALL_CARDS) {
-//            allCard.setPlayer(null);
-//        }
-//    }
-
-    /**
      * This method choose a next player to draw a card.
      * if the direction is not recognizable (RIGHT_WAY) or (LEFT_WAY)
      * then it will throw an Error
-     * @throws GameServiceException
+     * @throws GameServiceException if there is a case where the direction is not LEFT or RIGHT
      */
     protected void nextCurrentPlayer() throws GameServiceException {
         int index = getIndexCurrentPlayer(encounter.getCurrentPlayer());
@@ -299,7 +278,7 @@ public class GameService {
      * the player. If the card is not being found, return -1
      *
      * @param card   a certain of card
-     * @param colour
+     * @param colour a certain of colour
      * @param player a certain of player
      * @return the index of a card, where is being saved in a list
      */
@@ -317,11 +296,11 @@ public class GameService {
     /**
      * This function let the Player withdraw the card and set another player
      * to play the card
+     *
      * @param player the player who wants to withdraw
-     * @return this GameService to call another methods or function
      * @throws GameServiceException If it is a wrong player who draws the card
      */
-    public GameService withdraw(Player player) throws GameServiceException {
+    public void withdraw( Player player) throws GameServiceException {
         if(!encounter.getCurrentPlayer().getTypePlayer().equals(BOT)) {
             try{
                 addRandomCard(player);
@@ -336,7 +315,6 @@ public class GameService {
         } else {
             throw new GameServiceException("Not your turn yet!");
         }
-        return this;
     }
 
 }

@@ -15,18 +15,14 @@ public class App extends Application {
     private Stage stage;
     private Controller controller;
 
-    private GameService gameService;
-
-    public App(){
-        this.gameService = new GameService(new Random());
-    }
+    private final GameService gameService;
 
     public App( Random random ) {
         this.gameService = new GameService(random);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         this.stage = primaryStage;
         primaryStage.setScene(new Scene(new Label("Loading...")));
         primaryStage.setTitle("Uno");
