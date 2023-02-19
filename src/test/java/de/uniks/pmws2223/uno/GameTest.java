@@ -1,18 +1,18 @@
 package de.uniks.pmws2223.uno;
 
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
-import org.testfx.service.locator.BoundsLocatorException;
 
-import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,7 @@ public class GameTest extends ApplicationTest {
     private Stage stage;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         this.stage = stage;
         Random random = new Random(12);
         App app = new App(random);
@@ -30,7 +30,7 @@ public class GameTest extends ApplicationTest {
     }
 
     @Test
-    public void simpleCirculationTest(){
+    public void simpleCirculationTest() throws InterruptedException {
         final String startTitle = "UNO - Setup";
         final String battleTitle = "UNO - Ingame";
 
@@ -68,6 +68,22 @@ public class GameTest extends ApplicationTest {
         out: while(stage.getTitle().equals(battleTitle) && i < 5) {
             while(!hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
                 //busy waiting ...
+                /*
+                 * Without sleep, there could be a memory leak, since there are 2 different
+                 * threads run together, FXrobot and the source program (controller and services)
+                 *
+                 * Chat GPT:
+                 * FXRobot is a utility class that provides methods for simulating user input,
+                 * such as clicking on buttons and typing in text fields, in a JavaFX application.
+                 * When you call a method on FXRobot, it executes that action in a separate thread,
+                 * not in the thread that your application is running in. This is because JavaFX
+                 * has a single UI thread, also known as the "JavaFX Application Thread",
+                 * which is responsible for handling user events, updating the UI, and executing
+                 * code that interacts with the UI.
+                 *
+                 * https://openjfx.io/javadoc/16/javafx.graphics/javafx/test/FXRobot.html
+                 * */
+                Thread.sleep(1000);
                 if(!stage.getTitle().equals(battleTitle)){
                     break out;
                 }
@@ -83,7 +99,7 @@ public class GameTest extends ApplicationTest {
             int tempt = 0, indexCard = -1;
             // https://www.geeksforgeeks.org/how-to-solve-concurrentmodificationexception-in-java/
             for (Node child : hBox.getChildren()) {
-                assert  child instanceof StackPane : " Not a card from UnoCard";
+                assert  child instanceof StackPane : "Not a card from UnoCard";
 
                 StackPane card = (StackPane) child;
                 Label text = (Label) card.getChildren().get(1);
@@ -115,6 +131,7 @@ public class GameTest extends ApplicationTest {
                 clickOn("#withdraw");
             }
             i++;
+
         }
 
 //        clickOn("#mainMenuButton");
@@ -131,7 +148,7 @@ public class GameTest extends ApplicationTest {
 
 
     @Test
-    public void gameCirculationTest(){
+    public void gameCirculationTest() throws InterruptedException {
 
         final String startTitle = "UNO - Setup";
         final String battleTitle = "UNO - Ingame";
@@ -161,6 +178,22 @@ public class GameTest extends ApplicationTest {
         out: while(stage.getTitle().equals(battleTitle)) {
             while(!hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
                 //busy waiting ...
+                /*
+                * Without sleep, there could be a memory leak, since there are 2 different
+                * threads run together, FXrobot and the source program (controller and services)
+                *
+                * Chat GPT:
+                * FXRobot is a utility class that provides methods for simulating user input,
+                * such as clicking on buttons and typing in text fields, in a JavaFX application.
+                * When you call a method on FXRobot, it executes that action in a separate thread,
+                * not in the thread that your application is running in. This is because JavaFX
+                * has a single UI thread, also known as the "JavaFX Application Thread",
+                * which is responsible for handling user events, updating the UI, and executing
+                * code that interacts with the UI.
+                *
+                * https://openjfx.io/javadoc/16/javafx.graphics/javafx/test/FXRobot.html
+                * */
+                Thread.sleep(1000);
                 if(!stage.getTitle().equals(battleTitle)){
                     //if the robot stil plays the game but
                     // the screen has changed, then just quit!
