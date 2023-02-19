@@ -8,11 +8,13 @@ public class Card
    public static final String PROPERTY_NUMBER = "Number";
    public static final String PROPERTY_PLAYER = "player";
    public static final String PROPERTY_COLOUR = "colour";
+   public static final String PROPERTY_CURRENT_DISCARD_PILE = "currentDiscardPile";
    private String name;
    private int Number;
    protected PropertyChangeSupport listeners;
    private Player player;
    private Colour colour;
+   private Encounter currentDiscardPile;
 
    public String getName()
    {
@@ -90,8 +92,44 @@ public class Card
       }
 
       final Colour oldValue = this.colour;
+      if (this.colour != null)
+      {
+         this.colour = null;
+         oldValue.withoutCards(this);
+      }
       this.colour = value;
+      if (value != null)
+      {
+         value.withCards(this);
+      }
       this.firePropertyChange(PROPERTY_COLOUR, oldValue, value);
+      return this;
+   }
+
+   public Encounter getCurrentDiscardPile()
+   {
+      return this.currentDiscardPile;
+   }
+
+   public Card setCurrentDiscardPile(Encounter value)
+   {
+      if (this.currentDiscardPile == value)
+      {
+         return this;
+      }
+
+      final Encounter oldValue = this.currentDiscardPile;
+      if (this.currentDiscardPile != null)
+      {
+         this.currentDiscardPile = null;
+         oldValue.setCurrentCard(null);
+      }
+      this.currentDiscardPile = value;
+      if (value != null)
+      {
+         value.setCurrentCard(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_DISCARD_PILE, oldValue, value);
       return this;
    }
 
@@ -125,6 +163,7 @@ public class Card
    public void removeYou()
    {
       this.setColour(null);
+      this.setCurrentDiscardPile(null);
       this.setPlayer(null);
    }
 }

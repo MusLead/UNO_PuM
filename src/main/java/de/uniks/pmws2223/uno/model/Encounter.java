@@ -8,12 +8,12 @@ import java.beans.PropertyChangeSupport;
 public class Encounter
 {
    public static final String PROPERTY_PLAYERS = "players";
-   public static final String PROPERTY_CURRENT_CARD = "currentCard";
    public static final String PROPERTY_CURRENT_PLAYER = "currentPlayer";
+   public static final String PROPERTY_CURRENT_CARD = "currentCard";
    private List<Player> players;
    protected PropertyChangeSupport listeners;
-   private Card currentCard;
    private Player currentPlayer;
+   private Card currentCard;
 
    public List<Player> getPlayers()
    {
@@ -81,24 +81,6 @@ public class Encounter
       return this;
    }
 
-   public Card getCurrentCard()
-   {
-      return this.currentCard;
-   }
-
-   public Encounter setCurrentCard(Card value)
-   {
-      if (this.currentCard == value)
-      {
-         return this;
-      }
-
-      final Card oldValue = this.currentCard;
-      this.currentCard = value;
-      this.firePropertyChange(PROPERTY_CURRENT_CARD, oldValue, value);
-      return this;
-   }
-
    public Player getCurrentPlayer()
    {
       return this.currentPlayer;
@@ -123,6 +105,33 @@ public class Encounter
          value.setCurrentDiscardPile(this);
       }
       this.firePropertyChange(PROPERTY_CURRENT_PLAYER, oldValue, value);
+      return this;
+   }
+
+   public Card getCurrentCard()
+   {
+      return this.currentCard;
+   }
+
+   public Encounter setCurrentCard(Card value)
+   {
+      if (this.currentCard == value)
+      {
+         return this;
+      }
+
+      final Card oldValue = this.currentCard;
+      if (this.currentCard != null)
+      {
+         this.currentCard = null;
+         oldValue.setCurrentDiscardPile(null);
+      }
+      this.currentCard = value;
+      if (value != null)
+      {
+         value.setCurrentDiscardPile(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_CARD, oldValue, value);
       return this;
    }
 

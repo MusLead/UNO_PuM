@@ -31,15 +31,17 @@ public class GenModel implements ClassModelDecorator {
 
     public class Card {
         String name;
-        @Link()
+        @Link("cards")
         Colour colour;
         int Number;
         @Link("cards")
         Player player;
+        @Link("currentCard")
+        Encounter currentDiscardPile;
     }
 
     public class Encounter {
-        @Link()
+        @Link("currentDiscardPile")
         Card currentCard;
         @Link("currentDiscardPile")
         Player currentPlayer;
@@ -49,6 +51,8 @@ public class GenModel implements ClassModelDecorator {
 
     public class Colour {
         String name;
+        @Link("colour")
+        List<Card> cards;
     }
 
     public class TypePlayer {

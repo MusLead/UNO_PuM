@@ -29,7 +29,7 @@ public class GameService {
         return encounter;
     }
 
-    public GameService(){
+    public GameService() {
         this.random = new Random();
         int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
         this.encounter.setCurrentCard(constants.ALL_CARDS[randomIndex]);
@@ -42,7 +42,7 @@ public class GameService {
      * This constructor should be used if the random has seed
      * @param random with seed
      */
-    public GameService( Random random ){
+    public GameService( Random random ) {
         this.random = random;
         int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
         this.encounter.setCurrentCard(constants.ALL_CARDS[randomIndex]);

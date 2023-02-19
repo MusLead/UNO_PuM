@@ -1,5 +1,5 @@
 - c: 	org.fulib.classmodel.ClassModel
-  classes: 	typePlayer 	colour 	encounter 	card 	player
+  classes: 	typePlayer 	colour 	card 	encounter 	player
   defaultCollectionType: 	c1
   defaultPropertyStyle: 	Bean
   defaultRoleType: 	"java.util.ArrayList<%s>"
@@ -21,14 +21,7 @@
   modified: 	false
   name: 	Colour
   propertyStyle: 	Bean
-  roles: 	colour_Card_colour
-
-- encounter: 	org.fulib.classmodel.Clazz
-  model: 	c
-  modified: 	false
-  name: 	Encounter
-  propertyStyle: 	Bean
-  roles: 	encounter_currentCard 	encounter_currentPlayer 	encounter_players
+  roles: 	colour_cards
 
 - card: 	org.fulib.classmodel.Clazz
   attributes: 	card_name 	card_Number
@@ -36,7 +29,14 @@
   modified: 	false
   name: 	Card
   propertyStyle: 	Bean
-  roles: 	card_Encounter_currentCard 	card_colour 	card_player
+  roles: 	card_colour 	card_currentDiscardPile 	card_player
+
+- encounter: 	org.fulib.classmodel.Clazz
+  model: 	c
+  modified: 	false
+  name: 	Encounter
+  propertyStyle: 	Bean
+  roles: 	encounter_currentCard 	encounter_currentPlayer 	encounter_players
 
 - player: 	org.fulib.classmodel.Clazz
   attributes: 	player_name
@@ -82,16 +82,65 @@
   type: 	String
   typeSignature: 	String
 
-- colour_Card_colour: 	org.fulib.classmodel.AssocRole
+- colour_cards: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
-  cardinality: 	0
+  cardinality: 	42
   clazz: 	colour
   collectionType: 	c1
-  id: 	Colour_Card_colour
+  id: 	Colour_cards
   modified: 	false
+  name: 	cards
   other: 	card_colour
   propertyStyle: 	Bean
   roleType: 	"java.util.ArrayList<%s>"
+
+- card_name: 	org.fulib.classmodel.Attribute
+  clazz: 	card
+  id: 	Card_name
+  modified: 	false
+  name: 	name
+  propertyStyle: 	Bean
+  type: 	String
+  typeSignature: 	String
+
+- card_Number: 	org.fulib.classmodel.Attribute
+  clazz: 	card
+  id: 	Card_Number
+  modified: 	false
+  name: 	Number
+  propertyStyle: 	Bean
+  type: 	int
+  typeSignature: 	int
+
+- card_colour: 	org.fulib.classmodel.AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	card
+  id: 	Card_colour
+  modified: 	false
+  name: 	colour
+  other: 	colour_cards
+  propertyStyle: 	Bean
+
+- card_currentDiscardPile: 	org.fulib.classmodel.AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	card
+  id: 	Card_currentDiscardPile
+  modified: 	false
+  name: 	currentDiscardPile
+  other: 	encounter_currentCard
+  propertyStyle: 	Bean
+
+- card_player: 	org.fulib.classmodel.AssocRole
+  aggregation: 	false
+  cardinality: 	1
+  clazz: 	card
+  id: 	Card_player
+  modified: 	false
+  name: 	player
+  other: 	player_cards
+  propertyStyle: 	Bean
 
 - encounter_currentCard: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
@@ -100,7 +149,7 @@
   id: 	Encounter_currentCard
   modified: 	false
   name: 	currentCard
-  other: 	card_Encounter_currentCard
+  other: 	card_currentDiscardPile
   propertyStyle: 	Bean
 
 - encounter_currentPlayer: 	org.fulib.classmodel.AssocRole
@@ -124,55 +173,6 @@
   other: 	player_encounter
   propertyStyle: 	Bean
   roleType: 	"java.util.ArrayList<%s>"
-
-- card_name: 	org.fulib.classmodel.Attribute
-  clazz: 	card
-  id: 	Card_name
-  modified: 	false
-  name: 	name
-  propertyStyle: 	Bean
-  type: 	String
-  typeSignature: 	String
-
-- card_Number: 	org.fulib.classmodel.Attribute
-  clazz: 	card
-  id: 	Card_Number
-  modified: 	false
-  name: 	Number
-  propertyStyle: 	Bean
-  type: 	int
-  typeSignature: 	int
-
-- card_Encounter_currentCard: 	org.fulib.classmodel.AssocRole
-  aggregation: 	false
-  cardinality: 	0
-  clazz: 	card
-  collectionType: 	c1
-  id: 	Card_Encounter_currentCard
-  modified: 	false
-  other: 	encounter_currentCard
-  propertyStyle: 	Bean
-  roleType: 	"java.util.ArrayList<%s>"
-
-- card_colour: 	org.fulib.classmodel.AssocRole
-  aggregation: 	false
-  cardinality: 	1
-  clazz: 	card
-  id: 	Card_colour
-  modified: 	false
-  name: 	colour
-  other: 	colour_Card_colour
-  propertyStyle: 	Bean
-
-- card_player: 	org.fulib.classmodel.AssocRole
-  aggregation: 	false
-  cardinality: 	1
-  clazz: 	card
-  id: 	Card_player
-  modified: 	false
-  name: 	player
-  other: 	player_cards
-  propertyStyle: 	Bean
 
 - player_name: 	org.fulib.classmodel.Attribute
   clazz: 	player
