@@ -387,6 +387,9 @@ public class IngameController implements Controller{
             System.out.println(result + " " +
                                        card.getColour() + " currentPlayer: " + gameService.getEncounter().getCurrentPlayer()); //DEBUG
         } else if(result.equals(NOT_VALID)){
+            //19.02.2023
+            //this error messsage can come because of the GameTest.java -> memory leak because of the busy waiting.
+            //make sure that the FXRobot can run synchronously with the timer or the other that could lead to run in another thread
             System.err.println(NOT_VALID + ": "+card.getName() + " " +
                                        card.getColour() + " | On discard pile: "+ gameService.getEncounter().getCurrentCard()
                                        +" currentPlayer: " + gameService.getEncounter().getCurrentPlayer()); //DEBUG
