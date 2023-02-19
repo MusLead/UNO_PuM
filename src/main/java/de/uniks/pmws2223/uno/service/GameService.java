@@ -74,10 +74,6 @@ public class GameService {
         for (int i = 0; i < 7; i++) {
             try{
                 addRandomCard(player);
-            } catch (StackOverflowError se){
-                System.err.println("(GameService.java:77) ");
-//                reset_ALL_CARD(); //THE PLAY IS GAME OVER!
-                throw new StackOverflowError(se.getLocalizedMessage());
             } catch (GameServiceException e) {
                 System.err.println("(GameService.java:77) " + e.getMessage());
                 throw new RuntimeException(e.getMessage());
@@ -91,9 +87,9 @@ public class GameService {
      * This function add a card tp the player. it will look through
      * the ALL_CARD constant, until it found one
      * @param player the player who will get a card
-     * @throws StackOverflowError the card might not be found
+     * @throws GameServiceException the card might not be found
      */
-    protected void addRandomCard( Player player ) throws StackOverflowError, GameServiceException {
+    protected void addRandomCard( Player player ) throws GameServiceException {
         int randomIndex = abs(random.nextInt() % constants.ALL_CARDS.length);
         if(!player.getCards().contains(constants.ALL_CARDS[randomIndex]) && constants.ALL_CARDS[randomIndex].getPlayer() == null) {
             player.withCards(constants.ALL_CARDS[randomIndex]);
@@ -134,7 +130,7 @@ public class GameService {
      * @return  the cards that has been drawn, otherwise NOT_VALID
      * @throws GameServiceException throw am exception for this specific class
      */
-    public String drawCard(Card card, Player player) throws GameServiceException {
+    public String placeCard( Card card, Player player) throws GameServiceException {
 
         for (Player encounterPlayer : encounter.getPlayers()) {
             if(encounterPlayer.getCards().size() == 0){
@@ -184,9 +180,6 @@ public class GameService {
                     try{
                         addRandomCard(encounter.getCurrentPlayer());
                         addRandomCard(encounter.getCurrentPlayer());
-                    } catch (StackOverflowError se){ // TODO clean up stackoverflow catches!
-                        System.err.println("(GameService.java:194) or 195" + se.getLocalizedMessage());
-                        throw new StackOverflowError(se.getLocalizedMessage());
                     } catch (GameServiceException e) {
                         System.err.println("(GameService.java:194) or 195" + e.getMessage());
                         throw new RuntimeException(e.getMessage());
@@ -206,9 +199,6 @@ public class GameService {
                 
             }
 
-//            if(player.getCards() == null) {
-//                reset_ALL_CARD();
-//            }
             return returnValue == null ? NOT_VALID : returnValue;
             /*
             if there is no if statements above true, there is some possibility like:
@@ -225,12 +215,20 @@ public class GameService {
 
     }
 
-    public static boolean isConditionTrue( Card card, Card deckPile) {
-        boolean isSameColour = deckPile.getColour().getName().equals(card.getColour().getName());
-        return deckPile.getName().equals(card.getName())
+    /**
+     * This function is used to check whether the card that is being chosen (meets the condition) can be placed
+     * on the discard pile. For this project, this function is being used in UnoCardController().
+     * everytime the mouse hove on the card, it should check whether the card can be placed on the discard pile
+     * @param card the card that is being checked
+     * @param discardPile the current discardPile
+     * @return if met with the condition true, otherwise false
+     */
+    public static boolean isConditionTrue( Card card, Card discardPile) {
+        boolean isSameColour = discardPile.getColour().getName().equals(card.getColour().getName());
+        return discardPile.getName().equals(card.getName())
                 || isSameColour
-                || (deckPile.getNumber() != 0 && card.getNumber() != 0 &&
-                deckPile.getNumber() == card.getNumber());
+                || (discardPile.getNumber() != 0 && card.getNumber() != 0 &&
+                discardPile.getNumber() == card.getNumber());
     }
 
     /**
@@ -305,9 +303,6 @@ public class GameService {
         if(!encounter.getCurrentPlayer().getTypePlayer().equals(BOT)) {
             try{
                 addRandomCard(player);
-            } catch (StackOverflowError se) {
-                System.err.println("(GameService.java:318) ");
-                throw new StackOverflowError(se.getLocalizedMessage());
             } catch (GameServiceException e) {
                 System.err.println("(GameService.java:318) " + e.getMessage());
                 throw new RuntimeException(e.getMessage());

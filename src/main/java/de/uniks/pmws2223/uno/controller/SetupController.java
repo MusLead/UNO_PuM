@@ -40,7 +40,6 @@ public class SetupController implements Controller{
     public Parent render() throws IOException {
         final FXMLLoader loader = new FXMLLoader(App.class.getResource("view/Setup.fxml"));
         loader.setControllerFactory(callback -> this);
-//        nameField.setText("Agha");
         Parent parent = loader.load();
         choiceBoxBots.getItems().setAll("1","2","3");
         choiceBoxBots.setValue("1");
