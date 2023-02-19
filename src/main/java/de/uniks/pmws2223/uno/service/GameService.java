@@ -217,11 +217,12 @@ public class GameService {
                 should be not valid
              */
         } catch (NullPointerException e) {
-            throw new GameServiceException(deckPile + " colour: " + deckPile.getColour());
+        // if the card is wrong or the pointer is wrong!
+            System.err.println(e.getMessage());
+            System.err.println(deckPile + " colour: " + deckPile.getColour());
+            return NOT_VALID;
         }
 
-        // if the card is wrong
-//        return NOT_VALID;
     }
 
     public static boolean isConditionTrue( Card card, Card deckPile) {

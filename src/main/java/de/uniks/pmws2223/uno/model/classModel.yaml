@@ -44,7 +44,7 @@
   modified: 	false
   name: 	Player
   propertyStyle: 	Bean
-  roles: 	player_currentDrawPile 	player_encounter 	player_cards 	player_typePlayer
+  roles: 	player_currentDiscardPile 	player_encounter 	player_cards 	player_typePlayer
 
 - c1: 	org.fulib.classmodel.CollectionType
   implClass: 	class java.util.ArrayList
@@ -110,7 +110,7 @@
   id: 	Encounter_currentPlayer
   modified: 	false
   name: 	currentPlayer
-  other: 	player_currentDrawPile
+  other: 	player_currentDiscardPile
   propertyStyle: 	Bean
 
 - encounter_players: 	org.fulib.classmodel.AssocRole
@@ -183,13 +183,13 @@
   type: 	String
   typeSignature: 	String
 
-- player_currentDrawPile: 	org.fulib.classmodel.AssocRole
+- player_currentDiscardPile: 	org.fulib.classmodel.AssocRole
   aggregation: 	false
   cardinality: 	1
   clazz: 	player
-  id: 	Player_currentDrawPile
+  id: 	Player_currentDiscardPile
   modified: 	false
-  name: 	currentDrawPile
+  name: 	currentDiscardPile
   other: 	encounter_currentPlayer
   propertyStyle: 	Bean
 

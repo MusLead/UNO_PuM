@@ -122,10 +122,10 @@ public class IngameController implements Controller{
     public void destroy() {
         timer.stop();
         player.listeners().removePropertyChangeListener(Player.PROPERTY_CARDS, playerListeners);
-        player.listeners().removePropertyChangeListener(Player.PROPERTY_CURRENT_DRAW_PILE,currentDeckPilePlayerListener);
+        player.listeners().removePropertyChangeListener(Player.PROPERTY_CURRENT_DISCARD_PILE,currentDeckPilePlayerListener);
         for (int i = 0; i < totalBots; i++) {
             bots.get(i).listeners().removePropertyChangeListener(Player.PROPERTY_CARDS,botsListeners.get(i));
-            bots.get(i).listeners().removePropertyChangeListener(Player.PROPERTY_CURRENT_DRAW_PILE,botsListeners.get(i+totalBots));
+            bots.get(i).listeners().removePropertyChangeListener(Player.PROPERTY_CURRENT_DISCARD_PILE,botsListeners.get(i+totalBots));
         }
     }
 
@@ -181,12 +181,12 @@ public class IngameController implements Controller{
         player.listeners().addPropertyChangeListener(Player.PROPERTY_CARDS, playerListeners);
 
         currentDeckPilePlayerListener = ev -> showCurrentPlayerWithColour((Encounter) ev.getNewValue(), myContainer);
-        player.listeners().addPropertyChangeListener(Player.PROPERTY_CURRENT_DRAW_PILE, currentDeckPilePlayerListener);
+        player.listeners().addPropertyChangeListener(Player.PROPERTY_CURRENT_DISCARD_PILE, currentDeckPilePlayerListener);
 
         setWithdrawButton(player);
 
-        if(player.getCurrentDrawPile() != null){ // start of the play, check if there is a bot who plays first!
-            showCurrentPlayerWithColour(player.getCurrentDrawPile(), (Pane) myScrollPane.getContent());
+        if(player.getCurrentDiscardPile() != null){ // start of the play, check if there is a bot who plays first!
+            showCurrentPlayerWithColour(player.getCurrentDiscardPile(), (Pane) myScrollPane.getContent());
         }
     }
 
@@ -346,11 +346,11 @@ public class IngameController implements Controller{
 
             enemiesContainer.getChildren().add(monsterContainer);
             PropertyChangeListener drawPileBotListener = e -> showCurrentPlayerWithColour((Encounter) e.getNewValue(), monsterContainer);
-            newBot.listeners().addPropertyChangeListener(Player.PROPERTY_CURRENT_DRAW_PILE, drawPileBotListener );
+            newBot.listeners().addPropertyChangeListener(Player.PROPERTY_CURRENT_DISCARD_PILE, drawPileBotListener );
             botsListeners.add(drawPileBotListener);
 
-            if(newBot.getCurrentDrawPile() != null){ // start of the play, check if there is a bot who plays first!
-                showCurrentPlayerWithColour(newBot.getCurrentDrawPile(),monsterContainer);
+            if(newBot.getCurrentDiscardPile() != null){ // start of the play, check if there is a bot who plays first!
+                showCurrentPlayerWithColour(newBot.getCurrentDiscardPile(),monsterContainer);
             }
 //            debugButton(newBot, monsterContainer);
         }

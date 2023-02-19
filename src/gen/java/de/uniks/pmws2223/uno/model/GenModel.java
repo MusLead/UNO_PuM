@@ -23,7 +23,7 @@ public class GenModel implements ClassModelDecorator {
         @Link("player")
         List<Card> cards;
         @Link("currentPlayer")
-        Encounter currentDrawPile;
+        Encounter currentDiscardPile;
         @Link("players")
         Encounter encounter;
 
@@ -41,7 +41,7 @@ public class GenModel implements ClassModelDecorator {
     public class Encounter {
         @Link()
         Card currentCard;
-        @Link("currentDrawPile")
+        @Link("currentDiscardPile")
         Player currentPlayer;
         @Link("encounter")
         List<Player> players;

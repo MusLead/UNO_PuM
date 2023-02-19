@@ -9,15 +9,15 @@ import java.beans.PropertyChangeSupport;
 public class Player
 {
    public static final String PROPERTY_NAME = "name";
-   public static final String PROPERTY_CURRENT_DRAW_PILE = "currentDrawPile";
    public static final String PROPERTY_ENCOUNTER = "encounter";
    public static final String PROPERTY_CARDS = "cards";
+   public static final String PROPERTY_CURRENT_DISCARD_PILE = "currentDiscardPile";
    public static final String PROPERTY_TYPE_PLAYER = "typePlayer";
    private String name;
    protected PropertyChangeSupport listeners;
-   private Encounter currentDrawPile;
    private Encounter encounter;
    private List<Card> cards;
+   private Encounter currentDiscardPile;
    private TypePlayer typePlayer;
 
    public String getName()
@@ -35,33 +35,6 @@ public class Player
       final String oldValue = this.name;
       this.name = value;
       this.firePropertyChange(PROPERTY_NAME, oldValue, value);
-      return this;
-   }
-
-   public Encounter getCurrentDrawPile()
-   {
-      return this.currentDrawPile;
-   }
-
-   public Player setCurrentDrawPile(Encounter value)
-   {
-      if (this.currentDrawPile == value)
-      {
-         return this;
-      }
-
-      final Encounter oldValue = this.currentDrawPile;
-      if (this.currentDrawPile != null)
-      {
-         this.currentDrawPile = null;
-         oldValue.setCurrentPlayer(null);
-      }
-      this.currentDrawPile = value;
-      if (value != null)
-      {
-         value.setCurrentPlayer(this);
-      }
-      this.firePropertyChange(PROPERTY_CURRENT_DRAW_PILE, oldValue, value);
       return this;
    }
 
@@ -158,6 +131,33 @@ public class Player
       return this;
    }
 
+   public Encounter getCurrentDiscardPile()
+   {
+      return this.currentDiscardPile;
+   }
+
+   public Player setCurrentDiscardPile(Encounter value)
+   {
+      if (this.currentDiscardPile == value)
+      {
+         return this;
+      }
+
+      final Encounter oldValue = this.currentDiscardPile;
+      if (this.currentDiscardPile != null)
+      {
+         this.currentDiscardPile = null;
+         oldValue.setCurrentPlayer(null);
+      }
+      this.currentDiscardPile = value;
+      if (value != null)
+      {
+         value.setCurrentPlayer(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_DISCARD_PILE, oldValue, value);
+      return this;
+   }
+
    public TypePlayer getTypePlayer()
    {
       return this.typePlayer;
@@ -205,7 +205,7 @@ public class Player
 
    public void removeYou()
    {
-      this.setCurrentDrawPile(null);
+      this.setCurrentDiscardPile(null);
       this.setEncounter(null);
       this.withoutCards(new ArrayList<>(this.getCards()));
       this.setTypePlayer(null);

@@ -7,40 +7,13 @@ import java.beans.PropertyChangeSupport;
 
 public class Encounter
 {
-   public static final String PROPERTY_CURRENT_PLAYER = "currentPlayer";
    public static final String PROPERTY_PLAYERS = "players";
    public static final String PROPERTY_CURRENT_CARD = "currentCard";
-   private Player currentPlayer;
+   public static final String PROPERTY_CURRENT_PLAYER = "currentPlayer";
    private List<Player> players;
    protected PropertyChangeSupport listeners;
    private Card currentCard;
-
-   public Player getCurrentPlayer()
-   {
-      return this.currentPlayer;
-   }
-
-   public Encounter setCurrentPlayer(Player value)
-   {
-      if (this.currentPlayer == value)
-      {
-         return this;
-      }
-
-      final Player oldValue = this.currentPlayer;
-      if (this.currentPlayer != null)
-      {
-         this.currentPlayer = null;
-         oldValue.setCurrentDrawPile(null);
-      }
-      this.currentPlayer = value;
-      if (value != null)
-      {
-         value.setCurrentDrawPile(this);
-      }
-      this.firePropertyChange(PROPERTY_CURRENT_PLAYER, oldValue, value);
-      return this;
-   }
+   private Player currentPlayer;
 
    public List<Player> getPlayers()
    {
@@ -123,6 +96,33 @@ public class Encounter
       final Card oldValue = this.currentCard;
       this.currentCard = value;
       this.firePropertyChange(PROPERTY_CURRENT_CARD, oldValue, value);
+      return this;
+   }
+
+   public Player getCurrentPlayer()
+   {
+      return this.currentPlayer;
+   }
+
+   public Encounter setCurrentPlayer(Player value)
+   {
+      if (this.currentPlayer == value)
+      {
+         return this;
+      }
+
+      final Player oldValue = this.currentPlayer;
+      if (this.currentPlayer != null)
+      {
+         this.currentPlayer = null;
+         oldValue.setCurrentDiscardPile(null);
+      }
+      this.currentPlayer = value;
+      if (value != null)
+      {
+         value.setCurrentDiscardPile(this);
+      }
+      this.firePropertyChange(PROPERTY_CURRENT_PLAYER, oldValue, value);
       return this;
    }
 
