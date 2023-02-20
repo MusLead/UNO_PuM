@@ -12,7 +12,7 @@ Kassel, 18.02.2023
 it took me 5 days to make sure everything goes well.
 I made a test where the play could be played 1000 times to make sure nothing wrong with my logic,
 and then it took long time to realize that I had some mistake within the GenModel concept 
-the Link() between cards and player. I thought everyone could have just the same cards.
+the Link() between cards and player. I thought every player could have just the same cards.
 but it will give an error, the card could be not drawn by the player
 and that really took a lot of time
 
