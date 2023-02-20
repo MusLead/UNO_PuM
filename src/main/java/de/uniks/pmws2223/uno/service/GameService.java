@@ -313,4 +313,18 @@ public class GameService {
         }
     }
 
+    /**
+     * set the colour of wildcard ONLY IF THE CARD IS ACTUALLY WILDCARD
+     * @param wildCard the wildcard
+     * @param colour the colour that the player choose for the wildcard
+     * @throws GameServiceException if not wildcard,t then set an error
+     */
+    public Card setWildcardColour(Card wildCard, Colour colour) throws GameServiceException {
+        if(!wildCard.getName().equals(WILDCARD_STRING)){
+            throw new GameServiceException("NOT WILDCARD!");
+        }
+        return wildCard.setColour(colour);
+
+    }
+
 }

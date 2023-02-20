@@ -89,9 +89,6 @@ public class IngameController implements Controller{
                     if(bot.getName().equals(checkPlayer.getName())){
                         try {
                             updateGameScreen(gameService.getEncounter().getCurrentCard(), botPlay(bot, gameService));
-                            if(bot.getCards().size() == 0){
-                                showGameOverScene(bot);
-                            }
                         } catch (GameServiceException ex) {
                             throw new RuntimeException(ex);
                         }
@@ -150,17 +147,7 @@ public class IngameController implements Controller{
 
         //for starter, iterate all card that player has
         for (Card card : player.getCards()) {
-            if(card.getName().equals(WILDCARD_STRING)){
-                try {
-                    showWildCard(card,player,indexCardOnClick);
-                } catch (GameServiceException e) {
-                    // possibility: if the card is not wildcard, but it is still being called to the WildCard!
-                    throw new RuntimeException(e);
-                }
-            } else {
-                StackPane cardPane = showCards(indexCardOnClick,card);
-                myContainer.getChildren().add(cardPane);
-            }
+            showUserCard(indexCardOnClick, card);
         }
 
         // set player listeners, if the card is being placed or the player draw a new card
@@ -187,17 +174,7 @@ public class IngameController implements Controller{
                     if the player withdraw from the game,
                     the old value is null and get new value will be the new one
                  */
-                if(((Card) news.getNewValue()).getName().contains(WILDCARD_STRING)){
-                    try {
-                        showWildCard(((Card) news.getNewValue()),player, indexCardOnClick);
-                    } catch (GameServiceException e) {
-                        // possibility: if the card is not wildcard, but it is still being called to the WildCard!
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    StackPane newCardPane = showCards(indexCardOnClick, ((Card) news.getNewValue()));
-                    myContainer.getChildren().add(newCardPane);
-                }
+                showUserCard(indexCardOnClick,(Card) news.getNewValue());
             }
 
             // start the timer for the robot to  work!
@@ -215,6 +192,27 @@ public class IngameController implements Controller{
         if(player.getCurrentDiscardPile() != null){ // start of the play, check if there is a bot who plays first!
             showCurrentPlayerWithColour(player.getCurrentDiscardPile(), (Pane) myScrollPane.getContent());
         }
+    }
+
+    /**
+     * This function let the user have a card (whether normal card or wildcard) and add them
+     * to the myContainer.
+     * @param indexCardOnClick the index position of the card, used to now where the card is located
+     * @param card the new card
+     */
+    private void showUserCard( AtomicInteger indexCardOnClick, Card card ) {
+        StackPane cardPane;
+        if(card.getName().equals(WILDCARD_STRING)){
+            try {
+                cardPane = showWildCard(card, player, indexCardOnClick);
+            } catch (GameServiceException e) {
+                // possibility: if the card is not wildcard, but it is still being called to the WildCard!
+                throw new RuntimeException(e);
+            }
+        } else {
+            cardPane = showCard(indexCardOnClick, card);
+        }
+        myContainer.getChildren().add(cardPane);
     }
 
     /**
@@ -260,7 +258,7 @@ public class IngameController implements Controller{
      *                         It will be used later in the listeners for removing this card.
      * @throws GameServiceException if the card is not wildcard, throw some exception!
      */
-    private void showWildCard( Card wildCard, Player player, AtomicInteger indexCardOnClick ) throws GameServiceException {
+    private StackPane showWildCard( Card wildCard, Player player, AtomicInteger indexCardOnClick ) throws GameServiceException {
 
         if(!wildCard.getName().equals(WILDCARD_STRING)){
             throw new GameServiceException("NOT WILDCARD, INVALID");
@@ -297,7 +295,7 @@ public class IngameController implements Controller{
                 // if the player choose a colour on the wildcard that they have
                 // put the wild card to the discard deck!
                 try {
-                    Card choosenCard = wildCard.setColour(COLOURS[finalI]);
+                    Card choosenCard = gameService.setWildcardColour(wildCard,COLOURS[finalI]);
                     discardedCardAction(indexCardOnClick, choosenCard);
                 } catch (GameServiceException e) {
                     System.err.println(e.getMessage());
@@ -311,7 +309,7 @@ public class IngameController implements Controller{
         vBox.setAlignment(Pos.CENTER);
         stackPane.getChildren().add(vBox);
         stackPane.setAlignment(Pos.CENTER);
-        myContainer.getChildren().add(stackPane);
+        return stackPane;
     }
 
     /**
@@ -323,7 +321,7 @@ public class IngameController implements Controller{
      * @param card the detail of the card
      * @return a card with a container of stackPane
      */
-    private StackPane showCards( AtomicInteger indexCardOnClick, Card card )  {
+    private StackPane showCard( AtomicInteger indexCardOnClick, Card card )  {
         UnoCardController unoCardController = new UnoCardController(this,gameService,indexCardOnClick,card,player);
         StackPane stackPane;
         try {
@@ -336,7 +334,8 @@ public class IngameController implements Controller{
 
     /**
      * This Method let the User knows who plays next and which card is on the discard pile
-     * at this moment of time. After this User place a card.
+     * at this moment of time. Only after this User's player place a card.
+     * This method is being implemented in showWildCard() and
      * @param indexCardOnClick an integer, locate where this card is in the player's container placed.
      *                         It will be used later in the listeners for removing this card.
      * @param card the detail of the card
@@ -454,7 +453,9 @@ public class IngameController implements Controller{
             int finalI = i;
             PropertyChangeListener botListener = news -> {
                // System.out.println(" News from bot"+finalI+" cards: " + news); //DEBUG
-
+                if(newBot.getCards().size() == 0){
+                    showGameOverScene(newBot);
+                }
                 //this if-statement let the user now how many cards do they have (physically)
                 if(news.getOldValue() != null && news.getNewValue() == null){
                     removeCard(pane, newBot.getCards().size(),cards);
@@ -471,7 +472,7 @@ public class IngameController implements Controller{
             newBot.listeners().addPropertyChangeListener(Player.PROPERTY_CARDS, botListener);
             bots.add(newBot); botsListeners.add(botListener);
 
-            //Make an Info CContainer that shows how many cards the robot has
+            //Make an Info Container that shows how many cards the robot has
             VBox botInfoContainer = new VBox();
             botInfoContainer.setAlignment(Pos.CENTER);
             botInfoContainer.setId("Bot"+(i+1));
