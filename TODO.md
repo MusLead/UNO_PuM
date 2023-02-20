@@ -3,11 +3,9 @@
 Regardless of the type (robot or human)
 
 # TODO
-- clean up the code
-- think again about the necessary test!
-- add some explanation every method including Ingame!
-- change object and class diagram into currentDiscardPile!
-- change draw a card to place a card, because they have different definiton!
+- FOR THE PRESENTATION, between Ingame and UNOcard there should be some
+explanation a connection between them. Make a diagram of how it is actually connected each other 
+
 
 # Journal
 Kassel, 18.02.2023
@@ -27,12 +25,37 @@ When I tried to program the test, I notice something that even I set a specific 
 the circulation between debug and normal run are difference. it took me
 a lot of time to grasp that problem.
 
+Recursion for this project?
+another problem was, i easily implement recursion
+to my programm, that leads to memory leak (possibly)
+
 Kassel, 19.02.2023
-Today i just design the Maschine better in some way.
+Today I just design the Maschine better in some way.
 what took me a lot of time is to think how the cards can hover and how
-can i simulate the stack of the pile from the robot.
+can I simulate the stack of the pile from the robot.
 That was a real challenge.
 
-I have some questions regardles to the test. I have some randomized card.
-do i have to test all action ability with in a method ( i make a lot of methods,
-where i test only one action behaviour.)?
+you know, I think I realised something that people who programming and
+has a lot of debug like unexpected errors and catch because of test, let them think if
+there is possibility that this program could be wrong. I am glad
+that I have that time to think if there are mistakes in the program or not.
+
+Test: does the class Colour worth it?
+YOu know I began to believe that my Colour class should be just abolished. The reason 
+is that every time I tried to test it , there might be a case that the colour cannot be 
+detected. But you know what, I think the problem goes back again to the Link()
+it is not being 2 ways associated. let me try to change it.
+
+so I found that it is not really the colour class (even though yes the class is 
+somewhat fragile, because it takes some memory, can lead to memory leak) but 
+it was not really of that, because the test has busy waiting, that eats a lot of memory!
+so, i set a Thread.sleep to make sure that FXRobot does not run simultaneously with 
+JavaFX source code (espicially when the robot runs the program )
+
+
+
+# Question
+I have some questions regardless to the test. I have some randomized card.
+do I have to test all action ability with in a method ( I make a lot of methods,
+where I test only one action behaviour.)?
+

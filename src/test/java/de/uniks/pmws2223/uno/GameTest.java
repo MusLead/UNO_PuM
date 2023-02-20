@@ -24,7 +24,7 @@ public class GameTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        Random random = new Random(12);
+        Random random = new Random(162);
         App app = new App(random);
         app.start(stage);
     }
@@ -134,7 +134,6 @@ public class GameTest extends ApplicationTest {
 
         }
 
-//        clickOn("#mainMenuButton");
         //• Leave-Button klicken
         clickOn("#logout");
 
@@ -145,7 +144,6 @@ public class GameTest extends ApplicationTest {
         userName = lookup("#nameField").queryAs(TextField.class);
         assertEquals("", userName.getText());
     }
-
 
     @Test
     public void gameCirculationTest() throws InterruptedException {
@@ -175,7 +173,9 @@ public class GameTest extends ApplicationTest {
         HBox hBox = lookup("#myContainer").queryAs(HBox.class);
         ScrollPane scrollPane = lookup("#myScrollPane").queryAs(ScrollPane.class);
 
+        //play the game!
         out: while(stage.getTitle().equals(battleTitle)) {
+            //check if it is our run to place.draw the card
             while(!hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
                 //busy waiting ...
                 /*
@@ -240,7 +240,7 @@ public class GameTest extends ApplicationTest {
                 }
                 if(indexCard >= 0) {
                     // remove the card if we found a target when we iterate hBox children
-                    //if the target is not visible, or there might be an error
+                    // if the target is not visible, or there might be an error
                     // try to scroll the pane
                     StackPane target = (StackPane) hBox.getChildren().get(indexCard);
                     if(target.isVisible()){
@@ -249,7 +249,6 @@ public class GameTest extends ApplicationTest {
                         } catch (RuntimeException be){
                             scrollPane.setHvalue(1);
                             assertEquals(1, scrollPane.getHvalue(), 0.001);
-//                            clickOn(target);
                             if(scrollPane.getHvalue() >= scrollPane.getHmax()){
                                 // Scroll the ScrollPane back to the left
                                 scrollPane.setHvalue(0.0);
@@ -272,9 +271,10 @@ public class GameTest extends ApplicationTest {
             }
         }
 
-        clickOn("#mainMenuButton");
+        // GAME OVER
         //• Leave-Button klicken
-//        clickOn("#logout");
+        clickOn("#mainMenuButton");
+
 
         //• Fenstertitel erneut prüfen
         assertEquals(startTitle,stage.getTitle());

@@ -278,7 +278,6 @@ public class IngameController implements Controller{
         // iterates all possible colour and show them to the user
         for (int i = 0; i < 4; i++) {
             Button colour = new Button();
-           // colour.setText(COLOURS[i].getName());
 
             if(COLOURS[i].equals(BLUE)){
                 colour.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
@@ -342,8 +341,7 @@ public class IngameController implements Controller{
      * @throws GameServiceException if there is some unexpected behavior from the card
      */
     protected void discardedCardAction( AtomicInteger indexCardOnClick, Card card) throws GameServiceException {
-        String value = card.getName() + "," + card.getColour();
-        indexCardOnClick.set(gameService.findIndexCards(value, card.getColour(), player));
+        indexCardOnClick.set(gameService.findIndexCards(card, player));
         String result = gameService.placeCard(card, player);
         updateGameScreen(card, result);
     }

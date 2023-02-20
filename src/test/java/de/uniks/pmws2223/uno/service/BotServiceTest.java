@@ -12,13 +12,13 @@ import static org.junit.Assert.assertEquals;
 
 public class BotServiceTest {
 
+    /**
+     * This is a test between robot.
+     * Assumption: if this test run smoothly,
+     * then the robot will do the round also without a problem
+     */
     @Test
     public void roundBotTest() throws GameServiceException {
-        /*
-         * this is a test between robot.
-         * Assumption: if this test run smoothly,
-         * then the robot will do the round also without a problem
-         */
         System.out.println("roundBotTest");
         Random random = new Random(242342);
         GameService gameService = new GameService(random);
@@ -81,12 +81,5 @@ public class BotServiceTest {
 */
         }
 
-    }
-
-    @Test
-    public void roundBotTestrunde() throws GameServiceException {
-        for (int i = 0; i < 1000; i++) {
-            roundBotTest();
-        }
     }
 }

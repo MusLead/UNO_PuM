@@ -94,7 +94,7 @@ public class GameService {
         if(!player.getCards().contains(constants.ALL_CARDS[randomIndex]) && constants.ALL_CARDS[randomIndex].getPlayer() == null) {
             player.withCards(constants.ALL_CARDS[randomIndex]);
         } else {
-            // SIMPLE OPTION, BUT RISKY FOR THE TEST!
+            // RECURSION IS A SIMPLE OPTION, BUT RISKY FOR THE TEST!
             // if here player has the same card, try to find another card, recursively !
             // until the player has one!
             // addRandomCard(player);
@@ -118,7 +118,7 @@ public class GameService {
                 }
             }
         }
-//        System.out.println(constants.ALL_CARDS[randomIndex]); //DEBUG
+        // System.out.println(constants.ALL_CARDS[randomIndex]); //DEBUG
     }
 
     /**
@@ -276,15 +276,15 @@ public class GameService {
      * This function return an Index of a certain card that belongs to
      * the player. If the card is not being found, return -1
      *
-     * @param card   a certain of card
-     * @param colour a certain of colour
+     * @param card   a chosen card
      * @param player a certain of player
      * @return the index of a card, where is being saved in a list
      */
-    public int findIndexCards( String card, Colour colour, Player player) {
+    public int findIndexCards( Card card, Player player) {
+        String value = card.getName() + "," + card.getColour();
         int index = 0;
         for (Card playerCard : player.getCards()) {
-            if(card.contains(playerCard.getName()) && playerCard.getColour().equals(colour)) {
+            if(value.contains(playerCard.getName()) && playerCard.getColour().equals(card.getColour())) {
                 return index;
             }
             index++;
@@ -324,7 +324,6 @@ public class GameService {
             throw new GameServiceException("NOT WILDCARD!");
         }
         return wildCard.setColour(colour);
-
     }
 
 }
