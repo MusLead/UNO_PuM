@@ -272,6 +272,8 @@ public class IngameController implements Controller{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // to add the button
         VBox vBox = new VBox();
         vBox.setSpacing(5.0);
 
@@ -279,18 +281,28 @@ public class IngameController implements Controller{
         for (int i = 0; i < 4; i++) {
             Button colour = new Button();
 
-            if(COLOURS[i].equals(BLUE)){
-                colour.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
-            } else if(COLOURS[i].equals(RED)){
-                colour.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
-            } else if(COLOURS[i].equals(GREEN)){
-                colour.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
-            } else if(COLOURS[i].equals(YELLOW)){
-                colour.setStyle("-fx-background-color: orange; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
-            }
+            setColourWildcardButton(i, colour);
 
             int finalI = i;
-            colour.setOnAction(actionEvent -> {
+            colour.setOnMouseEntered(mouseDragEvent -> { //on hover
+                System.out.println("hover...");
+                if(COLOURS[finalI].equals(BLUE)){
+                    colour.setStyle("-fx-background-color: #0066CC; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+                } else if(COLOURS[finalI].equals(RED)){
+                    colour.setStyle("-fx-background-color: #e74949; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+                } else if(COLOURS[finalI].equals(GREEN)){
+                    colour.setStyle("-fx-background-color: #409d43; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+                } else if(COLOURS[finalI].equals(YELLOW)){
+                    colour.setStyle("-fx-background-color: #dbbd63; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+                }
+            });
+
+            colour.setOnMouseExited(mouseEvent -> {
+                System.out.println("exit... i:" + finalI);
+                setColourWildcardButton(finalI, colour);
+            });
+
+            colour.setOnAction(actionEvent -> { //not on hover
                 // if the player choose a colour on the wildcard that they have
                 // put the wild card to the discard deck!
                 try {
@@ -309,6 +321,18 @@ public class IngameController implements Controller{
         stackPane.getChildren().add(vBox);
         stackPane.setAlignment(Pos.CENTER);
         return stackPane;
+    }
+
+    private static void setColourWildcardButton( int i, Button colour ) {
+        if(COLOURS[i].equals(BLUE)){
+            colour.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+        } else if(COLOURS[i].equals(RED)){
+            colour.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+        } else if(COLOURS[i].equals(GREEN)){
+            colour.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+        } else if(COLOURS[i].equals(YELLOW)){
+            colour.setStyle("-fx-background-color: orange; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
+        }
     }
 
     /**
