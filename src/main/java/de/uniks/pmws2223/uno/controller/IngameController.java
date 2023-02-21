@@ -285,7 +285,7 @@ public class IngameController implements Controller{
 
             int finalI = i;
             colour.setOnMouseEntered(mouseDragEvent -> { //on hover
-                System.out.println("hover...");
+                // System.out.println("hover..."); //DEBUG
                 if(COLOURS[finalI].equals(BLUE)){
                     colour.setStyle("-fx-background-color: #0066CC; -fx-text-fill: white; -fx-font-size: 16px; -fx-pref-height: 20px; -fx-pref-width: 70px;");
                 } else if(COLOURS[finalI].equals(RED)){
@@ -298,7 +298,7 @@ public class IngameController implements Controller{
             });
 
             colour.setOnMouseExited(mouseEvent -> {
-                System.out.println("exit... i:" + finalI);
+                // System.out.println("exit... i:" + finalI); //DEBUG
                 setColourWildcardButton(finalI, colour);
             });
 
@@ -415,7 +415,7 @@ public class IngameController implements Controller{
                                        card.getColour() + " | On discard pile: "+ gameService.getEncounter().getCurrentCard()
                                        +" currentPlayer: " + gameService.getEncounter().getCurrentPlayer()); //DEBUG
         } else { // this statement is always true if the result equals withdraw
-            System.err.println(WITHDRAW + ": " + "| On discard pile: "+ gameService.getEncounter().getCurrentCard()
+            System.out.println(WITHDRAW + ": " + "| On discard pile: "+ gameService.getEncounter().getCurrentCard()
                                        +" currentPlayer: " + gameService.getEncounter().getCurrentPlayer()); //DEBUG
             // show the users who play the games now
             deckPileText.setText("The Player before, WITHDRAW\nYour Turn: " + gameService.getEncounter().getCurrentPlayer());

@@ -33,7 +33,7 @@ public class BotService {
 
             for (Card botCard : bot.getCards()) { //goes through all the card to find another card!
                 if(botCard.getName().contains(gameService.getConstants().WILDCARD.getName())){
-                    Random random = new Random();
+                    Random random = gameService.getRandom();
                     int index = random.nextInt(COLOURS.length);
                     botCard.setColour(COLOURS[index]);
                 }

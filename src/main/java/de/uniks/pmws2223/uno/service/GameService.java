@@ -4,6 +4,7 @@ import de.uniks.pmws2223.uno.Constants;
 import de.uniks.pmws2223.uno.model.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +28,10 @@ public class GameService {
 
     public Encounter getEncounter() {
         return encounter;
+    }
+
+    protected Random getRandom() {
+        return random;
     }
 
     public GameService() {
@@ -190,7 +195,7 @@ public class GameService {
                 }
                 returnValue = deckPile.getName() + "," + deckPile.getColour();
                 
-            } else if (card.getName().equals(WILDCARD_STRING)) {
+            } else if (card.getName().equals(WILDCARD_STRING) && card.getColour() != null) {
                 nextCurrentPlayer(); //to the nextPlayer
                 encounter.setCurrentCard(card);
                 deckPile = encounter.getCurrentCard();
@@ -224,11 +229,19 @@ public class GameService {
      * @return if met with the condition true, otherwise false
      */
     public static boolean isConditionTrue( Card card, Card discardPile) {
-        boolean isSameColour = discardPile.getColour().getName().equals(card.getColour().getName());
-        return discardPile.getName().equals(card.getName())
-                || isSameColour
-                || (discardPile.getNumber() != 0 && card.getNumber() != 0 &&
-                discardPile.getNumber() == card.getNumber());
+        try {
+            if(!card.getName().contains(WILDCARD_STRING)) {
+                boolean isSameColour = discardPile.getColour().getName().equals(card.getColour().getName());
+                return discardPile.getName().equals(card.getName())
+                        || isSameColour
+                        || (discardPile.getNumber() != 0 && card.getNumber() != 0 &&
+                        discardPile.getNumber() == card.getNumber());
+            }
+        } catch (NullPointerException ne){
+            System.err.println(ne.getMessage());
+            System.err.println(Arrays.toString(ne.getStackTrace()));
+        }
+        return false;
     }
 
     /**
