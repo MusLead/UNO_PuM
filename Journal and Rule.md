@@ -3,8 +3,8 @@
 Regardless of the type (robot or human)
 
 # TODO
-- FOR THE PRESENTATION, between Ingame and UNOcard there should be some
-explanation a connection between them. Make a diagram of how it is actually connected each other 
+- I think the figma will take me a lot of times, because i have to really focus on it
+- please do not do it. do it after the klausur Digilog!
 
 
 # Journal
