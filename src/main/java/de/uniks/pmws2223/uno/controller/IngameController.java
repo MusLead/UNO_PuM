@@ -158,7 +158,7 @@ public class IngameController implements Controller{
 
         // set player listeners, if the card is being placed or the player draw a new card
         playerListeners = news -> {
-             System.out.println("News from player cards: " + news); //DEBUG
+             // System.out.println("News from player cards: " + news); //DEBUG
 
             // If the player does not have any card, means the game is over, and player won the game
             if(gameService.isGameOver(player)) {
