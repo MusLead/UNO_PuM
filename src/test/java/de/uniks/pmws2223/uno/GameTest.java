@@ -20,17 +20,21 @@ import static org.junit.Assert.assertEquals;
 public class GameTest extends ApplicationTest {
 
     private Stage stage;
-
+    private App app;
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        Random random = new Random(162);
-        App app = new App(random);
+        Random random = new Random(56);
+        app = new App(random);
         app.start(stage);
     }
 
+    /**
+     * This is a test where it tests the circulation of the game
+     * until a few round and then log out
+     */
     @Test
-    public void simpleCirculationTest() throws InterruptedException {
+    public void simpleCirculationTest() {
         final String startTitle = "UNO - Setup";
         final String battleTitle = "UNO - Ingame";
 
@@ -43,6 +47,7 @@ public class GameTest extends ApplicationTest {
         write(name);
         TextField userName = lookup("#nameField").queryAs(TextField.class);
         assertEquals(name, userName.getText());
+        @SuppressWarnings("rawtypes")
         ChoiceBox choiceBoxBots = lookup("#choiceBoxBots").queryAs(ChoiceBox.class);
         clickOn(choiceBoxBots);
         clickOn("3");
@@ -65,28 +70,17 @@ public class GameTest extends ApplicationTest {
         assertEquals(0.0, scrollPane.getHvalue(), 0.001);
 
         int i = 0;
-        out: while(stage.getTitle().equals(battleTitle) && i < 5) {
-            while(!hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
-                //busy waiting ...
-                /*
-                 * Without sleep, there could be a memory leak, since there are 2 different
-                 * threads run together, FXrobot and the source program (controller and services)
-                 *
-                 * Chat GPT:
-                 * FXRobot is a utility class that provides methods for simulating user input,
-                 * such as clicking on buttons and typing in text fields, in a JavaFX application.
-                 * When you call a method on FXRobot, it executes that action in a separate thread,
-                 * not in the thread that your application is running in. This is because JavaFX
-                 * has a single UI thread, also known as the "JavaFX Application Thread",
-                 * which is responsible for handling user events, updating the UI, and executing
-                 * code that interacts with the UI.
-                 *
-                 * https://openjfx.io/javadoc/16/javafx.graphics/javafx/test/FXRobot.html
-                 * */
-                Thread.sleep(1000);
-                if(!stage.getTitle().equals(battleTitle)){
-                    break out;
+        while(stage.getTitle().equals(battleTitle) && i < 5) {
+            try { // this is for the FXRobot when dealing  withTimer from IngameController init
+                if(i!=0) {
+                    app.getGameService().getCountDownLatch().await();
                 }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if(!stage.getTitle().equals(battleTitle)){
+                //it could be in the middle of the play the screen has already game over!
+                break;
             }
 
             HBox deckContainer = lookup("#deckContainer").queryAs(HBox.class);
@@ -98,6 +92,10 @@ public class GameTest extends ApplicationTest {
 
             int tempt = 0, indexCard = -1;
             // https://www.geeksforgeeks.org/how-to-solve-concurrentmodificationexception-in-java/
+            /*
+            Conclusion, do not remove the element inside the list
+            during the iteration of the list
+             */
             for (Node child : hBox.getChildren()) {
                 assert  child instanceof StackPane : "Not a card from UnoCard";
 
@@ -145,8 +143,12 @@ public class GameTest extends ApplicationTest {
         assertEquals("", userName.getText());
     }
 
+    /**
+     * This is a test of the game where the players
+     * play until someone win the game
+     */
     @Test
-    public void gameCirculationTest() throws InterruptedException {
+    public void gameCirculationTest() {
 
         final String startTitle = "UNO - Setup";
         final String battleTitle = "UNO - Ingame";
@@ -160,6 +162,7 @@ public class GameTest extends ApplicationTest {
         write(name);
         TextField userName = lookup("#nameField").queryAs(TextField.class);
         assertEquals(name, userName.getText());
+        @SuppressWarnings("rawtypes")
         ChoiceBox choiceBoxBots = lookup("#choiceBoxBots").queryAs(ChoiceBox.class);
         clickOn(choiceBoxBots);
         clickOn("3");
@@ -172,33 +175,22 @@ public class GameTest extends ApplicationTest {
 
         HBox hBox = lookup("#myContainer").queryAs(HBox.class);
         ScrollPane scrollPane = lookup("#myScrollPane").queryAs(ScrollPane.class);
-
+        int i = 0;
         //play the game!
-        out: while(stage.getTitle().equals(battleTitle)) {
-            //check if it is our run to place.draw the card
-            while(!hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
-                //busy waiting ...
-                /*
-                * Without sleep, there could be a memory leak, since there are 2 different
-                * threads run together, FXrobot and the source program (controller and services)
-                *
-                * Chat GPT:
-                * FXRobot is a utility class that provides methods for simulating user input,
-                * such as clicking on buttons and typing in text fields, in a JavaFX application.
-                * When you call a method on FXRobot, it executes that action in a separate thread,
-                * not in the thread that your application is running in. This is because JavaFX
-                * has a single UI thread, also known as the "JavaFX Application Thread",
-                * which is responsible for handling user events, updating the UI, and executing
-                * code that interacts with the UI.
-                *
-                * https://openjfx.io/javadoc/16/javafx.graphics/javafx/test/FXRobot.html
-                * */
-                Thread.sleep(1000);
-                if(!stage.getTitle().equals(battleTitle)){
-                    //if the robot stil plays the game but
-                    // the screen has changed, then just quit!
-                    break out;
+        while(stage.getTitle().equals(battleTitle)) {
+            //check if it is our turn to place/draw the card
+
+            try { // this is for the FX robot I guess
+                if(i!=0) {
+                    app.getGameService().getCountDownLatch().await();
                 }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if(!stage.getTitle().equals(battleTitle)){
+                //it could be in the middle of the play the screen has already game over!
+                break;
             }
 
             //we want to take an index of the card on the pile
@@ -215,8 +207,10 @@ public class GameTest extends ApplicationTest {
 
             int tempt = 0, indexCard = -1;
             // https://www.geeksforgeeks.org/how-to-solve-concurrentmodificationexception-in-java/
+            // make sure not changing/removing the element of the list while iterating the List!
                 for (Node child : hBox.getChildren()) {
-                    assert  child instanceof StackPane : " Not a card from UnoCard";
+                    //iterate the card, if there is a card that we can place it to discard pile
+                    assert child instanceof StackPane : "Not a card from UnoCard";
 
                     StackPane card = (StackPane) child;
                     Label text = (Label) card.getChildren().get(1);
@@ -227,19 +221,19 @@ public class GameTest extends ApplicationTest {
                     if(string.equals(stringDeck) || colorCard.equals(colorDeck)){ //compare the value
                         //in this hBox there is a card with one or more of the same components
                         // with the card deck, save the index, and the remove it later!
-                        if(string.equals(stringDeck)){
+                        if(string.equals(stringDeck)){ // does the card has the same value "numbers or action?"
                             assertEquals(stringDeck,string);
                         }
-                        if(colorCard.equals(colorDeck)) {
+                        if(colorCard.equals(colorDeck)) { // does the card has the same colour
                             assertEquals(colorDeck, colorCard);
                         }
-                        indexCard = tempt;
+                        indexCard = tempt; // IF WE FOUND THE TARGET, SAVE THE INDEX VALUE!
                         break;
                     }
                     tempt++;
                 }
                 if(indexCard >= 0) {
-                    // remove the card if we found a target when we iterate hBox children
+                    // remove the card if we found a target when we iterated hBox children
                     // if the target is not visible, or there might be an error
                     // try to scroll the pane
                     StackPane target = (StackPane) hBox.getChildren().get(indexCard);
@@ -269,6 +263,7 @@ public class GameTest extends ApplicationTest {
             if(stage.getTitle().equals(battleTitle) && hBox.getBackground().getFills().get(0).getFill().equals(Color.AQUA)){
                 clickOn("#withdraw");
             }
+            i++;
         }
 
         // GAME OVER

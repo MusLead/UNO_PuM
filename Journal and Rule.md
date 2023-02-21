@@ -3,7 +3,7 @@
 Regardless of the type (robot or human)
 
 # TODO
-- I think the figma will take me a lot of times, because i have to really focus on it
+- I think the figma will take me a lot of times, because I have to really focus on it
 - please do not do it. do it after the klausur Digilog!
 
 
@@ -26,7 +26,7 @@ the circulation between debug and normal run are difference. it took me
 a lot of time to grasp that problem.
 
 Recursion for this project?
-another problem was, i easily implement recursion
+another problem was, I easily implement recursion
 to my programm, that leads to memory leak (possibly)
 
 Kassel, 19.02.2023
@@ -49,8 +49,16 @@ it is not being 2 ways associated. let me try to change it.
 so I found that it is not really the colour class (even though yes the class is 
 somewhat fragile, because it takes some memory, can lead to memory leak) but 
 it was not really of that, because the test has busy waiting, that eats a lot of memory!
-so, i set a Thread.sleep to make sure that FXRobot does not run simultaneously with 
-JavaFX source code (espicially when the robot runs the program )
+so, I set a Thread.sleep to make sure that FXRobot does not run simultaneously with 
+JavaFX source code (especially when the robot runs the program )
+
+The other things that i found interesting is that my GameService has a failure that will lead to 
+async failure. Everytime robots draws a Wildcard, they could draw something that 
+does not have a colour. and i thought it because the async execution. but it wasn't that.
+It was because that in Playgame, the wildcard will be placed by the bot1 or whoever the bot is
+and the colour will remain null. 
+
+i add more statement on the if-condition, so that it will only accept wildcard that has colour in it.
 
 
 

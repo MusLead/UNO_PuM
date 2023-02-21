@@ -1,6 +1,7 @@
 package de.uniks.pmws2223.uno;
 
 import de.uniks.pmws2223.uno.controller.Controller;
+import de.uniks.pmws2223.uno.controller.GameOverController;
 import de.uniks.pmws2223.uno.controller.SetupController;
 import de.uniks.pmws2223.uno.service.GameService;
 import javafx.application.Application;
@@ -16,6 +17,10 @@ public class App extends Application {
     private Controller controller;
 
     private final GameService gameService;
+
+    public GameService getGameService() {
+        return gameService;
+    }
 
     // !!!
     /* WITHOUT THIS CONSTRUCTOR, IT WILL RETURN SUCH WIERD FAILURE MESSAGE:
@@ -81,6 +86,7 @@ public class App extends Application {
         controller.init();
         try {
             stage.getScene().setRoot(controller.render());
+
         } catch (IOException ex) {
             ex.printStackTrace();
             return;
@@ -92,5 +98,8 @@ public class App extends Application {
         }
         this.controller = controller;
         stage.setTitle(controller.getTitle());
+        if(controller instanceof GameOverController) {
+            getGameService().getCountDownLatch().countDown(); // to make sure the FXRobot do the action further!
+        }
     }
 }

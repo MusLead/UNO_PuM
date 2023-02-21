@@ -114,7 +114,7 @@ public class UnoCardController implements Controller{
 
                 // try to place the card on the discard pile
                 try {
-                    ingameController.discardedCardAction(Objects.requireNonNull(indexCardOnClick), card);
+                    ingameController.discardedCardAction(Objects.requireNonNull(indexCardOnClick), card, player);
                 } catch (GameServiceException e) {
                     System.err.println(e.getMessage());
                 }

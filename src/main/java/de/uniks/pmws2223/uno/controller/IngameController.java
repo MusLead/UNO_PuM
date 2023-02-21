@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pmws2223.uno.Constants.*;
@@ -42,7 +43,9 @@ public class IngameController implements Controller{
     private PropertyChangeListener playerListeners;
     private PropertyChangeListener currentDeckPilePlayerListener;
     private Timer timer;
-    private Player player;
+    private Player player; //WARNING! this variable is only be used for the listener!
+
+    AtomicInteger secure = new AtomicInteger(0);
 
     @FXML
     public HBox enemiesContainer;
@@ -78,10 +81,10 @@ public class IngameController implements Controller{
     public void init() {
         /*
          * this the time if this robot and the next player also robot who will
-         * place a card on the discard pile
+         * place a card on the discard pile.
          */
         // Note: the timer will start if the player draws the card!
-        // (player card's listener detect some changes on the list)
+        // (when player card's listener detect some changes on the list, then start the timer)
         timer = new Timer(500, e -> Platform.runLater(() -> {
             Player checkPlayer = gameService.getEncounter().getCurrentPlayer();
             if(checkPlayer.getTypePlayer().equals(BOT)){
@@ -96,7 +99,10 @@ public class IngameController implements Controller{
                 }
 
             } else {
+                gameService.getCountDownLatch().countDown();
                 timer.stop();
+                secure.set(0);
+                // System.out.println("timer stop : " + gameService.getCountDownLatch().getCount()); //DEBUG
             }
         }));
     }
@@ -140,22 +146,22 @@ public class IngameController implements Controller{
      */
     private void showPlayer()  {
         // give the player 7 random cards!
-        player = gameService.createPlayer(HUMAN, name);
+        Player player = gameService.createPlayer(HUMAN, name);
 
         // this Integer let the program knows which card has been placed on the discard pile
         AtomicInteger indexCardOnClick = new AtomicInteger();
 
         //for starter, iterate all card that player has
         for (Card card : player.getCards()) {
-            showUserCard(indexCardOnClick, card);
+            showUserCard(indexCardOnClick, card, player);
         }
 
         // set player listeners, if the card is being placed or the player draw a new card
         playerListeners = news -> {
-            // System.out.println("News from player cards: " + news); //DEBUG
+             System.out.println("News from player cards: " + news); //DEBUG
 
             // If the player does not have any card, means the game is over, and player won the game
-            if(player.getCards().size() == 0) {
+            if(gameService.isGameOver(player)) {
                 showGameOverScene(player);
             }
 
@@ -174,13 +180,20 @@ public class IngameController implements Controller{
                     if the player withdraw from the game,
                     the old value is null and get new value will be the new one
                  */
-                showUserCard(indexCardOnClick,(Card) news.getNewValue());
+                showUserCard(indexCardOnClick,(Card) news.getNewValue(), player);
             }
 
             // start the timer for the robot to  work!
-            timer.start();
+            if(secure.get() == 0) { // to make sure the timer only stated once!,
+                // because of the DRAW_TWO, this listener might be called twice!
+                // System.out.println("timer start"); //DEBUG
+                timer.start();
+                app.getGameService().setCountDownLatch(new CountDownLatch(1));
+                secure.set(1);
+            }
         };
         player.listeners().addPropertyChangeListener(Player.PROPERTY_CARDS, playerListeners);
+
 
         // This listener determine who currently plays the game
         currentDeckPilePlayerListener = ev -> showCurrentPlayerWithColour((Encounter) ev.getNewValue(), myContainer);
@@ -192,6 +205,8 @@ public class IngameController implements Controller{
         if(player.getCurrentDiscardPile() != null){ // start of the play, check if there is a bot who plays first!
             showCurrentPlayerWithColour(player.getCurrentDiscardPile(), (Pane) myScrollPane.getContent());
         }
+
+        this.player = player;
     }
 
     /**
@@ -199,8 +214,9 @@ public class IngameController implements Controller{
      * to the myContainer.
      * @param indexCardOnClick the index position of the card, used to now where the card is located
      * @param card the new card
+     * @param player the player who plays the card
      */
-    private void showUserCard( AtomicInteger indexCardOnClick, Card card ) {
+    private void showUserCard( AtomicInteger indexCardOnClick, Card card, Player player ) {
         StackPane cardPane;
         if(card.getName().equals(WILDCARD_STRING)){
             try {
@@ -210,7 +226,7 @@ public class IngameController implements Controller{
                 throw new RuntimeException(e);
             }
         } else {
-            cardPane = showCard(indexCardOnClick, card);
+            cardPane = showCard(indexCardOnClick, card,player);
         }
         myContainer.getChildren().add(cardPane);
     }
@@ -307,7 +323,7 @@ public class IngameController implements Controller{
                 // put the wild card to the discard deck!
                 try {
                     Card choosenCard = gameService.setWildcardColour(wildCard,COLOURS[finalI]);
-                    discardedCardAction(indexCardOnClick, choosenCard);
+                    discardedCardAction(indexCardOnClick, choosenCard, player);
                 } catch (GameServiceException e) {
                     System.err.println(e.getMessage());
                 }
@@ -342,9 +358,10 @@ public class IngameController implements Controller{
      * @param indexCardOnClick an integer, locate where this card is in the player's container placed.
      *                         It will be used later in the listeners for removing this card.
      * @param card the detail of the card
+     * @param player the player who plays the game
      * @return a card with a container of stackPane
      */
-    private StackPane showCard( AtomicInteger indexCardOnClick, Card card )  {
+    private StackPane showCard( AtomicInteger indexCardOnClick, Card card, Player player )  {
         UnoCardController unoCardController = new UnoCardController(this,gameService,indexCardOnClick,card,player);
         StackPane stackPane;
         try {
@@ -364,7 +381,7 @@ public class IngameController implements Controller{
      * @param card the detail of the card
      * @throws GameServiceException if there is some unexpected behavior from the card
      */
-    protected void discardedCardAction( AtomicInteger indexCardOnClick, Card card) throws GameServiceException {
+    protected void discardedCardAction( AtomicInteger indexCardOnClick, Card card, Player player) throws GameServiceException {
         indexCardOnClick.set(gameService.findIndexCards(card, player));
         String result = gameService.placeCard(card, player);
         updateGameScreen(card, result);
@@ -475,7 +492,7 @@ public class IngameController implements Controller{
             int finalI = i;
             PropertyChangeListener botListener = news -> {
                // System.out.println(" News from bot"+finalI+" cards: " + news); //DEBUG
-                if(newBot.getCards().size() == 0){
+                if(gameService.isGameOver(newBot)){
                     showGameOverScene(newBot);
                 }
                 //this if-statement let the user now how many cards do they have (physically)
@@ -573,7 +590,7 @@ public class IngameController implements Controller{
             try {
                 String result = botPlay(newBot, gameService);
                 updateGameScreen(gameService.getEncounter().getCurrentCard(),result);
-                if(newBot.getCards().size() == 0){
+                if(gameService.isGameOver(newBot)){
                     showGameOverScene(newBot);
                 }
             } catch (GameServiceException e) {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 import static de.uniks.pmws2223.uno.Constants.*;
 import static java.lang.Math.*;
@@ -15,9 +16,14 @@ public class GameService {
     private final Random random;
     private final Constants constants = new Constants();
     private final Encounter encounter = new Encounter();
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     public Constants getConstants() {
         return constants;
+    }
+
+    public void setCountDownLatch( CountDownLatch countDownLatch ) {
+        this.countDownLatch = countDownLatch;
     }
 
     private String direction = RIGHT_WAY;
@@ -339,4 +345,11 @@ public class GameService {
         return wildCard.setColour(colour);
     }
 
+    public CountDownLatch getCountDownLatch() {
+        return countDownLatch;
+    }
+
+    public boolean isGameOver( Player player ) {
+        return player.getCards().size() == 0;
+    }
 }
