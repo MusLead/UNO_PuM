@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.uniks.pmws2223.uno.Constants.*;
-import static de.uniks.pmws2223.uno.service.BotService.*;
+import static de.uniks.pmws2223.uno.service.BotService.botPlay;
 
 public class IngameController implements Controller{
 
@@ -44,7 +44,6 @@ public class IngameController implements Controller{
     private PropertyChangeListener currentDeckPilePlayerListener;
     private Timer timer;
     private Player player; //WARNING! this variable is only be used for the listener!
-
     AtomicInteger secure = new AtomicInteger(0);
 
     @FXML
@@ -170,20 +169,25 @@ public class IngameController implements Controller{
                   if the old value not null and new value is null it means that the
                   player successfully place the card then
                  */
-                if(myContainer.getChildren().size() != 0) {
-                    myContainer.getChildren().remove(indexCardOnClick.get());
+                if(!myContainer.getChildren().isEmpty()) {
+                    //NOTE: THE pane still can be removed using this lookup!
+                    // without any atomicIndex!
+                    Card card = (Card) news.getOldValue();
+                    StackPane pane = (StackPane) myContainer.lookup("#"+card.getName()+","+card.getColour());
+                    myContainer.getChildren().remove(pane);
+//                    myContainer.getChildren().remove(indexCardOnClick.get());
                 }
             }
 
             if(news.getOldValue() == null && news.getNewValue() != null) {
                 /*
-                    if the player withdraw from the game,
+                    if the player withdraws from the game,
                     the old value is null and get new value will be the new one
                  */
                 showUserCard(indexCardOnClick,(Card) news.getNewValue(), player);
             }
 
-            // start the timer for the robot to  work!
+            // start the timer for the robot to work!
             if(secure.get() == 0) { // to make sure the timer only stated once!,
                 // because of the DRAW_TWO, this listener might be called twice!
                 // System.out.println("timer start"); //DEBUG
@@ -228,6 +232,7 @@ public class IngameController implements Controller{
         } else {
             cardPane = showCard(indexCardOnClick, card,player);
         }
+        cardPane.setId(card.getName()+","+card.getColour());
         myContainer.getChildren().add(cardPane);
     }
 
@@ -425,7 +430,7 @@ public class IngameController implements Controller{
             System.out.println(result + " " +
                                        card.getColour() + " currentPlayer: " + gameService.getEncounter().getCurrentPlayer()); //DEBUG
         } else if(result.equals(NOT_VALID)){
-            //19.02.2023
+            //19.02.2023 Assumption
             //this error messsage can come because of the GameTest.java -> memory leak because of the busy waiting.
             //make sure that the FXRobot can run synchronously with the timer or the other that could lead to run in another thread
             System.err.println(NOT_VALID + ": "+card.getName() + " " +
@@ -589,7 +594,8 @@ public class IngameController implements Controller{
         button.setOnAction(actionEvent -> {
             try {
                 String result = botPlay(newBot, gameService);
-                updateGameScreen(gameService.getEncounter().getCurrentCard(),result);
+                Card currentCard = gameService.getEncounter().getCurrentCard();
+                updateGameScreen(currentCard, result);
                 if(gameService.isGameOver(newBot)){
                     showGameOverScene(newBot);
                 }

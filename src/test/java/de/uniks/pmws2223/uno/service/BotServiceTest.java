@@ -14,7 +14,7 @@ public class BotServiceTest {
 
     /**
      * This is a test between robot.
-     * Assumption: if this test run smoothly,
+     * Assumption: if this test runs smoothly,
      * then the robot will do the round also without a problem
      */
     @Test
@@ -29,7 +29,7 @@ public class BotServiceTest {
         final Player bot3 = gameService.createPlayer(BOT, "Bot3");
 
         //Bot1 plays first
-        while(bot1.getCards().size() != 0 && bot2.getCards().size() != 0 && bot3.getCards().size() != 0) {
+        while(!bot1.getCards().isEmpty() && !bot2.getCards().isEmpty() && !bot3.getCards().isEmpty()) {
             String status = null;
 
             Player encounterPlayerBefore = gameService.getEncounter().getCurrentPlayer();
