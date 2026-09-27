@@ -1,10 +1,16 @@
 plugins {
     id 'java'
     // https://plugins.gradle.org/plugin/org.openjfx.javafxplugin
+    id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.13'
     // https://plugins.gradle.org/plugin/org.fulib.fulibGradle
     id 'org.fulib.fulibGradle' version '0.5.0'
 }
+
+application {
+    mainClass = 'de.uniks.pmws2223.uno.Main'
+}
+
 group 'de.uniks.pmws2223.uno.model'
 version '1.0.0'
 
